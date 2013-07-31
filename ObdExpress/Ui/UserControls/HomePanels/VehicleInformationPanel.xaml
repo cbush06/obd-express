@@ -1,0 +1,48 @@
+﻿<UserControl x:Class="ObdExpress.Ui.UserControls.HomePanels.VehicleInformationPanel"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:uc="clr-namespace:ObdExpress.Ui.UserControls"
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="300">
+    
+    <uc:RegisteredPanel>
+        
+        <uc:RegisteredPanel.Background>
+            <SolidColorBrush Color="White" />
+        </uc:RegisteredPanel.Background>
+        
+        <uc:RegisteredPanel.Header>
+            <DockPanel>
+                <Label Content="Vehicle Information" Foreground="White" DockPanel.Dock="Left" Padding="5,4,0,4" VerticalAlignment="Center" />
+                <Menu DockPanel.Dock="Right" HorizontalAlignment="Right" Background="Transparent">
+                    <MenuItem Padding="0">
+                        <MenuItem.Header>
+                            <StackPanel Orientation="Horizontal">
+                                <Label Content="Options" Foreground="White" Padding="5,4" VerticalAlignment="Center"/>
+                                <Image Source="pack://application:,,,/ObdExpress;component/UI/Images/down_arrow_512.png" Width="16" Height="16" Stretch="Fill" />
+                            </StackPanel>
+                        </MenuItem.Header>
+                        
+                        <MenuItem Header="Remove" Click="menItemRemove_Click"/>
+                        
+                    </MenuItem>
+                </Menu>
+            </DockPanel>
+        </uc:RegisteredPanel.Header>
+        
+        <uc:RegisteredPanel.HeaderBackgroundBrush>
+            <LinearGradientBrush StartPoint="0.5,0" EndPoint="0.5,1">
+                <GradientStop Color="#FF838383" Offset="0" />
+                <GradientStop Color="#FF666666" Offset=".5" />
+                <GradientStop Color="#FF474747" Offset="1" />
+            </LinearGradientBrush>
+        </uc:RegisteredPanel.HeaderBackgroundBrush>
+        
+        <uc:RegisteredPanel.Body>
+            <Label Content="Body" />
+        </uc:RegisteredPanel.Body>
+    </uc:RegisteredPanel>
+    
+</UserControl>

@@ -1,0 +1,32 @@
+﻿<Window
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit" x:Name="winDashboardPanelProperties" x:Class="ObdExpress.Ui.UserControls.HomePanels.DashboardPanelProperties"
+        Title="Dashboard Panel Properties" Height="280" Width="500" WindowStartupLocation="CenterOwner" SnapsToDevicePixels="True" ResizeMode="NoResize">
+    <StackPanel Orientation="Vertical" DataContext="{Binding Mode=OneWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}">
+        <DockPanel Margin="5,5,5,0">
+            <Label x:Name="lblPanels" Content="Panels" HorizontalAlignment="Left" Margin="0" VerticalAlignment="Center" Width="50" FontSize="14" Padding="0,0,5,0" DockPanel.Dock="Left"/>
+            <xctk:IntegerUpDown x:Name="iudColumns" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="5,0,0,0" Width="60" Value="{Binding Path=Columns, Mode=TwoWay}" Maximum="8" Minimum="1" ParsingNumberStyle="Integer" FontSize="14" DockPanel.Dock="Right" />
+            <Label x:Name="lblColumns" Content="Columns" HorizontalAlignment="Right" Margin="5,0,0,0" VerticalAlignment="Center" Width="60" FontSize="14" Padding="0,0,5,0" DockPanel.Dock="Right" VerticalContentAlignment="Center" />
+        </DockPanel>
+        
+        <DataGrid x:Name="dgPanels" HorizontalAlignment="Stretch" Margin="5,5,5,0" VerticalAlignment="Top" Height="167" Width="Auto" ItemsSource="{Binding DashboardItems}" CanUserAddRows="False" AutoGenerateColumns="False" SelectionMode="Single" RowHeaderWidth="0" HeadersVisibility="Column" VerticalScrollBarVisibility="Visible">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Position" Width=".15*" Binding="{Binding Position}" IsReadOnly="True"/>
+                <DataGridTextColumn Header="Measure" Width=".35*" Binding="{Binding Measure}" IsReadOnly="True"/>
+                <DataGridTextColumn Header="Unit" Width=".35*" Binding="{Binding Unit}" IsReadOnly="True"/>
+                <DataGridTemplateColumn Header="Is Shown" Width=".15*">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <CheckBox IsChecked="{Binding IsShown, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,5,0">
+            <Button x:Name="btnDone" Content="Done" HorizontalAlignment="Left" Margin="5,0,0,0" VerticalAlignment="Top" Width="75" Click="btnDone_Click" FontSize="14"/>
+        </StackPanel>
+    </StackPanel>
+</Window>

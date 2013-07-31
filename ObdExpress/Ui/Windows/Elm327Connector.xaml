@@ -1,0 +1,52 @@
+﻿<Window x:Name="winElm327Connector" x:Class="ObdExpress.Ui.Windows.Elm327Connector"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="ELM327 Connector" Height="305" Width="500" WindowStartupLocation="CenterOwner" ResizeMode="NoResize" Closing="winElm327Connector_Closing" >
+    <DockPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch" DataContext="{Binding Mode=OneWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}">
+        <DockPanel LastChildFill="True" Margin="5,5,5,5" DockPanel.Dock="Top">
+            <Label Content="Choose a Port" HorizontalAlignment="Left" DockPanel.Dock="Left" Padding="0,3" FontSize="14"/>
+            <Button x:Name="btnOk" x:FieldModifier="private" Content="OK" DockPanel.Dock="Right" Width="35" Margin="10,0,0,0" FontSize="14" Click="btnOk_Click"/>
+            <ComboBox x:Name="cmbPortList" x:FieldModifier="private" DockPanel.Dock="Left" Margin="10,0,0,0" ItemsSource="{Binding MetaConnectors}" SelectedItem="{Binding SelectedConnector}" FontSize="14" />
+        </DockPanel>
+        <DataGrid x:Name="dgPorts" x:FieldModifier="private" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Visible" Margin="5,0,5,5"
+                  Height="170" AutoGenerateColumns="False" HeadersVisibility="Column" SelectionMode="Single" ItemsSource="{Binding PortConnectionStatusList}" DockPanel.Dock="Top" CanUserReorderColumns="False" CanUserResizeColumns="False" CanUserSortColumns="False" CanUserResizeRows="False">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Port Name" Width=".20*" Binding="{Binding PortName}" IsReadOnly="True" />
+                <DataGridTextColumn Header="Status" Width="0.7*" Binding="{Binding Status}" IsReadOnly="True" />
+                <DataGridTemplateColumn Header="" Width="0.1*" IsReadOnly="True">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Image Name="SuccessIndicator" Visibility="Hidden" Width="16" Height="16" />
+                            <DataTemplate.Triggers>
+                                <DataTrigger Binding="{Binding Success}" Value="true">
+                                    <DataTrigger.Setters>
+                                        <Setter TargetName="SuccessIndicator" Property="Source" Value="pack://application:,,,/ObdExpress;component/UI/Images/success32.png" />
+                                        <Setter TargetName="SuccessIndicator" Property="Visibility" Value="Visible" />
+                                    </DataTrigger.Setters>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Success}" Value="false">
+                                    <DataTrigger.Setters>
+                                        <Setter TargetName="SuccessIndicator" Property="Source" Value="pack://application:,,,/ObdExpress;component/UI/Images/delete32.png" />
+                                        <Setter TargetName="SuccessIndicator" Property="Visibility" Value="Visible" />
+                                    </DataTrigger.Setters>
+                                </DataTrigger>
+                            </DataTemplate.Triggers>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+            </DataGrid.Columns>
+        </DataGrid>
+        <DockPanel HorizontalAlignment="Right" Margin="5,0,5,5" DockPanel.Dock="Top">
+            <Button x:Name="btnCancel" Content="Close" DockPanel.Dock="Right" Click="btnCancel_Click" FontSize="14" Height="25" Width="52" />
+        </DockPanel>
+        <StatusBar HorizontalAlignment="Stretch" Padding="0" VerticalAlignment="Bottom" DockPanel.Dock="Bottom" BorderThickness="0">
+            <StatusBarItem HorizontalAlignment="Left">
+                <Label x:Name="lblStatus" x:FieldModifier="private" FontSize="14" Content="Ready." Padding="0" />
+            </StatusBarItem>
+
+            <StatusBarItem HorizontalAlignment="Right">
+                <ProgressBar x:Name="pbProgressBar" x:FieldModifier="private" Orientation="Horizontal" Width="100" Height="20" />
+            </StatusBarItem>
+        </StatusBar>
+    </DockPanel>
+</Window>

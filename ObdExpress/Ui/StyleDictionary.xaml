@@ -1,0 +1,26 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    
+    <!-- Section Header Dock -->
+    <Style x:Key="SectionHeaderDock" TargetType="DockPanel">
+        <Setter Property="Background">
+            <Setter.Value>
+                <LinearGradientBrush StartPoint="0.5,0" EndPoint="0.5,1">
+                    
+                    <GradientStop Color="#FF838383" Offset="0" />
+                    <GradientStop Color="#FF666666" Offset=".5" />
+                    <GradientStop Color="#FF474747" Offset="1" />
+                    
+                </LinearGradientBrush>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    
+    <!-- Section Header Label -->
+    <Style x:Key="SectionHeaderLabel" TargetType="Label">
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="Foreground" Value="White" />
+        <Setter Property="DockPanel.Dock" Value="Top" />
+        <Setter Property="Padding" Value="0,4,0,4" />
+    </Style>
+</ResourceDictionary>
