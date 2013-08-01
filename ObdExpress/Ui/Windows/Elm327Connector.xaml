@@ -1,7 +1,7 @@
 ﻿<Window x:Name="winElm327Connector" x:Class="ObdExpress.Ui.Windows.Elm327Connector"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="ELM327 Connector" Height="305" Width="500" WindowStartupLocation="CenterOwner" ResizeMode="NoResize" Closing="winElm327Connector_Closing" >
+        Title="ELM327 Connector" Height="305" Width="500" WindowStartupLocation="CenterOwner" ResizeMode="NoResize" Closing="winElm327Connector_Closing" Icon="/ObdExpress;component/Ui/Images/48x48icon.png" >
     <DockPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch" DataContext="{Binding Mode=OneWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}">
         <DockPanel LastChildFill="True" Margin="5,5,5,5" DockPanel.Dock="Top">
             <Label Content="Choose a Port" HorizontalAlignment="Left" DockPanel.Dock="Left" Padding="0,3" FontSize="14"/>

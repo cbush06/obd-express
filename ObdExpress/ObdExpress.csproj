@@ -249,6 +249,7 @@
     <Content Include="ObdExpress.sdf">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Resource Include="Ui\Images\48x48icon.png" />
     <Resource Include="Ui\Images\delete32.png" />
     <Resource Include="Ui\Images\success32.png" />
     <Resource Include="Ui\Images\disconnect.png" />

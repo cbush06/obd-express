@@ -4,7 +4,7 @@
         xmlns:uc="clr-namespace:ObdExpress.Ui.UserControls"
         xmlns:hc="clr-namespace:ObdExpress.Ui.UserControls.HomePanels"
         Title="OBD Express" Height="666" Width="889" Closing="_mainWindow_Closing"
-        WindowStartupLocation="CenterScreen" Loaded="MainWindow_Loaded">
+        WindowStartupLocation="CenterScreen" Loaded="MainWindow_Loaded" Icon="/ObdExpress;component/Ui/Images/48x48icon.png">
     
     <Grid>
         <Grid.Background>
