@@ -1,20 +1,17 @@
 ﻿using ELM327API.Connection.Interfaces;
+using ELM327API.Global;
 using log4net;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.IO.Ports;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace ELM327API.Connection.Classes
 {
     /// <summary>
     /// An IConnector that connects to a specific port.
     /// </summary>
-    public class PortConnector : IConnector, IDisposable
+    public class PortConnector : IConnector
     {
         /// <summary>
         /// Get the logger.
@@ -29,6 +26,7 @@ namespace ELM327API.Connection.Classes
 
         // Port to create a connection for
         private string _portName = "";
+        private ConnectionSettings _connectionSettings = null;
 
         // Port used by this connector
         SerialPort _currentPort = null;
@@ -37,9 +35,10 @@ namespace ELM327API.Connection.Classes
         /// Create a PortConnector for the specified port.
         /// </summary>
         /// <param name="portName">The port to create this connector for.</param>
-        public PortConnector(string portName)
+        public PortConnector(string portName, ConnectionSettings connectionSettings)
         {
             this._portName = portName;
+            this._connectionSettings = connectionSettings;
         }
 
         public void GetSerialPort()
@@ -47,7 +46,7 @@ namespace ELM327API.Connection.Classes
             bool success = false;
 
             // Expected device description
-            string deviceDescription = "OBDII to RS232 Interpreter";
+            string deviceDescription = _connectionSettings.DeviceDescription;
 
             // Actual description
             string receivedDescription = "";
@@ -60,30 +59,48 @@ namespace ELM327API.Connection.Classes
                 this.CheckingPort(this._portName);
 
                 // Prepare the port
-                _currentPort.BaudRate = 9600;
-                _currentPort.DataBits = 8;
-                _currentPort.Parity = Parity.None;
-                _currentPort.StopBits = StopBits.One;
+                _currentPort.BaudRate = _connectionSettings.BaudRate;
+                _currentPort.DataBits = _connectionSettings.DataBits;
+                _currentPort.Parity = _connectionSettings.Parity;
+                _currentPort.StopBits = _connectionSettings.StopBits;
                 _currentPort.NewLine = "\r";
                 _currentPort.ReadTimeout = 50;
                 _currentPort.WriteTimeout = 50;
 
+                // Log the configuration
+                PortConnector.log.Info("Checking port " + _currentPort.PortName + " with parameters"
+                                            + " BaudRate = " + _currentPort.BaudRate.ToString()
+                                            + ", DataBits = " + _currentPort.DataBits.ToString()
+                                            + ", Parity = " + _currentPort.Parity.ToString()
+                                            + ", StopBits = " + _currentPort.StopBits.ToString()
+                                            + ", Device Identifier = " + deviceDescription);
+
                 // Open and attempt a write and read
+                PortConnector.log.Info("Opening port...");
                 _currentPort.Open();
 
                 // Try to write and read
                 try
                 {
-                    _currentPort.WriteLine(@"AT E0");
-                    Thread.Sleep(40);
-                    _currentPort.DiscardInBuffer();
+                    PortConnector.log.Info("Writing [AT D]...");
+                    WriteLineDiscardInBuffer(@"AT D");
 
-                    _currentPort.WriteLine(@"AT @1");
-                    receivedDescription = _currentPort.ReadLine();
+                    WriteLineDiscardInBuffer(@"");
+
+                    PortConnector.log.Info("Writing [AT L0]...");
+                    WriteLineDiscardInBuffer(@"AT L0");
+
+                    PortConnector.log.Info("Writing [AT E0]...");
+                    WriteLineDiscardInBuffer(@"AT E0");
+
+                    PortConnector.log.Info("Writing [AT @1] to check Device Identifier...");
+                    receivedDescription = DiscardInBufferWriteAndReadExisting(@"AT @1");
+
+                    if (receivedDescription.Length > 0 && receivedDescription[0] == '>') receivedDescription = receivedDescription.Substring(1);
                 }
                 catch (TimeoutException e)
                 {
-                    Console.Out.WriteLine(e.Message);
+                    PortConnector.log.Error("TimeoutException has occurred. Assuming no response.", e);
                     this.UpdateMessages("NO RESPONSE!");
                     this.PortSuccess(false);
                 }
@@ -93,51 +110,78 @@ namespace ELM327API.Connection.Classes
                 {
                     if (receivedDescription.Equals(deviceDescription))
                     {
+                        PortConnector.log.Info("Successfully connected on port " + _currentPort.PortName + "!");
                         this.UpdateMessages("SUCCESS!");
                         this.PortSuccess(true);
                         success = true;
                         this.ConnectionEstablished(_currentPort);
                     }
+                    else
+                    {
+                        PortConnector.log.Error("Response to [AT @1] determined to be invalid Device Identifier: " + receivedDescription);
+                        this.UpdateMessages("INVALID DEVICE NAME: " + receivedDescription);
+                        this.PortSuccess(false);
+                        success = false;
+                    }
                 }
             }
             catch (IOException e)
             {
+                PortConnector.log.Error("IOException has occurred. Assuming No Device or Error.", e);
                 this.UpdateMessages("NO DEVICE OR ERROR!");
                 this.PortSuccess(false);
             }
             catch (InvalidOperationException e)
             {
+                PortConnector.log.Error("InvalidOperationException has occurred. Assuming No Device or Error.", e);
                 this.UpdateMessages("NO DEVICE OR ERROR!");
                 this.PortSuccess(false);
             }
             catch (UnauthorizedAccessException e)
             {
+                PortConnector.log.Error("UnauthorizedAccessException has occurred. Assuming No Device or Error.", e);
                 this.UpdateMessages("PORT IN USE, ACCESS DENIED!");
                 this.PortSuccess(false);
+            }
+
+            if (!success)
+            {
+                this._currentPort.Close();
             }
 
             this.ConnectionComplete(success);
         }
 
+        /// <summary>
+        /// Clear the input buffer, write the output, and read the entire input buffer (new lines included). Then, remove the prompt character and any new line or carriage return characters.
+        /// </summary>
+        /// <param name="output"></param>
+        /// <returns></returns>
+        public String DiscardInBufferWriteAndReadExisting(String output)
+        {
+            _currentPort.DiscardInBuffer();
+            _currentPort.WriteLine(output);
+            Thread.Sleep(60);
+            return _currentPort.ReadExisting().Replace(">", "").Replace("\n", "").Replace("\r", "");
+        }
 
+        /// <summary>
+        /// Write the output and then discard any input from the port.
+        /// </summary>
+        /// <param name="output"></param>
+        public void WriteLineDiscardInBuffer(String output)
+        {
+            _currentPort.WriteLine(output);
+            Thread.Sleep(60);
+            _currentPort.DiscardInBuffer();
+        }
+        
         /// <summary>
         /// Attempts to safely stop the thread by notifying the loop to return.
         /// </summary>
         public void Kill()
         {
             return;
-        }
-
-        /// <summary>
-        /// Implementation of the IDisposable interface.
-        /// </summary>
-        public void Dispose()
-        {
-            if (this._currentPort != null && this._currentPort.IsOpen)
-            {
-                this._currentPort.Close();
-                this._currentPort = null;
-            }
         }
     }
 }

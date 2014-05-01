@@ -1,23 +1,72 @@
-﻿using System;
+﻿using ELM327API.Processing.DataStructures;
+using ObdExpress.Global;
+using System;
 using System.Collections.Generic;
+using System.IO.Ports;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 
 namespace ObdExpress.Ui.UserControls.Interfaces
 {
     public interface IRegisteredPanel
     {
         /// <summary>
-        /// Instructs the RegisteredPanel to start monitoring the bus.
+        /// Returns a user-friendly name for this panel.
         /// </summary>
-        void StartMonitoring();
+        string Title { get; }
 
         /// <summary>
-        /// Instructs the RegisteredPanel to stop monitoring the bus.
+        /// Indicates if this panel should be hidden or not.
+        /// </summary>
+        bool IsShown { get; }
+
+        /// <summary>
+        /// Returns true if this panel has been paused previously.
+        /// </summary>
+        bool IsPaused { get; }
+
+        /// <summary>
+        /// Event Listener called when this panel should be hidden.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        void HidePanel(object sender, RoutedEventArgs e);
+
+        /// <summary>
+        /// Event Listener called when this panel should be shown.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        void ShowPanel(object sender, RoutedEventArgs e);
+
+        /// <summary>
+        /// Event listener called when an ELM327 connection is established. This is the Registered Panel's chance to hook into its corresponding ELM327 data handler.
+        /// </summary>
+        void StartMonitoring(SerialPort s);
+
+        /// <summary>
+        /// Event listener called when an ELM327 connection is about to be destroyed. This is the Registered Panel's chance to unregister itself.
         /// </summary>
         void StopMonitoring();
+
+        /// <summary>
+        /// Event listener called when monitoring should be temporarily paused (e.g. when panel collections are changing).
+        /// </summary>
+        void PauseMonitoring();
+
+        /// <summary>
+        /// Event listener called when monitoring should be unpaused (e.g. when a panel collection is re-shown).
+        /// </summary>
+        void UnPauseMonitoring();
+
+        /// <summary>
+        /// Receives data updates from the ELM327 device.
+        /// </summary>
+        /// <param name="e"></param>
+        void Update(ELM327ListenerEventArgs e);
 
         /// <summary>
         /// Registers an event handler to a particular type of event this panel might generate.

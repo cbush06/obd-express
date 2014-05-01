@@ -1,11 +1,8 @@
 ﻿using ELM327API.Connection.Interfaces;
+using ELM327API.Global;
 using log4net;
-using System;
 using System.Collections.Generic;
 using System.IO.Ports;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ELM327API.Connection.Classes
 {
@@ -54,19 +51,19 @@ namespace ELM327API.Connection.Classes
         /// </summary>
         /// <param name="metaConnector">Object describing a connector.</param>
         /// <returns>(IConnector) A connector that will attempt to establish a connection with a Serial Port to which an ELM327 device is attached.</returns>
-        public IConnector GetConnector(MetaConnector metaConnector)
+        public IConnector GetConnector(MetaConnector metaConnector, ConnectionSettings connectionSettings)
         {
             IConnector connector = null;
 
             // If this MetaConnector represents a particular port (as opposed to the AutoConnector)
             if (metaConnector.PortName.Length > 0)
             {
-                connector = new PortConnector(metaConnector.PortName);
+                connector = new PortConnector(metaConnector.PortName, connectionSettings);
             }
             else
             {
                 log.Info("Returning AutoConnector");
-                connector = new AutoConnector();
+                connector = new AutoConnector(connectionSettings);
             }
 
             return connector;

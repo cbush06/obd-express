@@ -20,13 +20,14 @@ using System.IO.Ports;
 using System.ComponentModel;
 using ObdExpress.Global;
 using System.IO;
+using ELM327API.Global;
 
 namespace ObdExpress.Ui.Windows
 {
     /// <summary>
     /// Interaction logic for Elm327Connector.xaml
     /// </summary>
-    public partial class Elm327Connector : Window, INotifyPropertyChanged
+    public partial class ELM327Connector : Window, INotifyPropertyChanged
     {
         /// <summary>
         /// Get the logger.
@@ -96,7 +97,7 @@ namespace ObdExpress.Ui.Windows
         /// <summary>
         /// Default constructor.
         /// </summary>
-        public Elm327Connector()
+        public ELM327Connector()
         {
             InitializeComponent();
 
@@ -115,7 +116,7 @@ namespace ObdExpress.Ui.Windows
             this._curPortConnectionStatus = null;
 
             // Get the correct Connector
-            IConnector connector = this._conFactory.GetConnector(this.SelectedConnector);
+            IConnector connector = this._conFactory.GetConnector(this.SelectedConnector, ConstructConnectionSettings());
             
             // Hook into the connector's events
             connector.CheckingPort += this.Connector_NextPort;
@@ -211,13 +212,16 @@ namespace ObdExpress.Ui.Windows
                     // Update the DataGrid
                     if (this._curPortConnectionStatus != null)
                     {
-                        this._curPortConnectionStatus.Success = success;
-
                         // If we found it...
                         if (success)
                         {
                             // Change the Status Bar
                             this.lblStatus.Content = "ELM327 found on " + this._curPortConnectionStatus.PortName + "!";
+                            this._curPortConnectionStatus.Success = success;
+                        }
+                        else
+                        {
+                            this._curPortConnectionStatus.Success = success;
                         }
                     }
                 }
@@ -232,8 +236,29 @@ namespace ObdExpress.Ui.Windows
         {
             this.Dispatcher.Invoke(new Action(() =>
                 {
-                    this.lblStatus.Content = "Connection Established on " + this._curPortConnectionStatus.PortName + "!";
-                    ELM327Connection.ConnectionEstablished(port);
+                    // Try to connect with ELM327 device for IO operations
+                    ELM327Connection.ConnectionEstablished(port, ConstructConnectionSettings());
+
+                    if (ELM327Connection.InOperation)
+                    {
+                        if (this._curPortConnectionStatus.Status.Length > 0)
+                        {
+                            this._curPortConnectionStatus.Status += ", ";
+                        }
+
+                        this._curPortConnectionStatus.Status += "Successful IO Operations!";
+                        this._curPortConnectionStatus.Success = true;
+                    }
+                    else
+                    {
+                        if (this._curPortConnectionStatus.Status.Length > 0)
+                        {
+                            this._curPortConnectionStatus.Status += ", ";
+                        }
+
+                        this._curPortConnectionStatus.Status += "Failed to Start IO Operations!";
+                        this._curPortConnectionStatus.Success = false;
+                    }
                 }
             ));
         }
@@ -246,7 +271,7 @@ namespace ObdExpress.Ui.Windows
         {
             this.Dispatcher.Invoke(new Action(() =>
                 {
-                    if (!(success))
+                    if (!(success) || !(ELM327Connection.InOperation))
                     {
                         // Enable Controls
                         this.btnOk.IsEnabled = true;
@@ -274,6 +299,21 @@ namespace ObdExpress.Ui.Windows
                     }
                 }
             ));
+        }
+
+        /// <summary>
+        /// Create a new ConnectionSettings object using the Application Properties settings.
+        /// </summary>
+        /// <returns>New ConnectionSettings object.</returns>
+        private ConnectionSettings ConstructConnectionSettings()
+        {
+            return new ConnectionSettings(
+                (int)Properties.ApplicationSettings.Default[Variables.SETTINGS_CONNECTION_BAUDRATE],
+                (int)Properties.ApplicationSettings.Default[Variables.SETTINGS_CONNECTION_DATABITS],
+                (Parity)Properties.ApplicationSettings.Default[Variables.SETTINGS_CONNECTION_PARITY],
+                (StopBits)Properties.ApplicationSettings.Default[Variables.SETTINGS_CONNECTION_STOPBITS],
+                (string)Properties.ApplicationSettings.Default[Variables.SETTINGS_CONNECTION_DEVICEDESCRIPTION]
+            );
         }
 
         /// <summary>

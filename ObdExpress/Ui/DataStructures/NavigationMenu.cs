@@ -25,6 +25,32 @@ namespace ObdExpress.Ui.DataStructures
         private event NavigationMenuEvent _navMenuEvent;
 
         /// <summary>
+        /// The sleected menu item.
+        /// </summary>
+        public MenuItem SelectedMenuItem
+        {
+            get
+            {
+                if (this._selectedTopMenu != null && this._selectedTopMenu.SelectedItem != null)
+                {
+                    return this._selectedTopMenu.SelectedItem;
+                }
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// The selected top-level menu.
+        /// </summary>
+        public TopMenu SelectedTopMenu
+        {
+            get
+            {
+                return this._selectedTopMenu;
+            }
+        }
+
+        /// <summary>
         /// Default constructor for a new NavigationMenu.
         /// </summary>
         public NavigationMenu()

@@ -13,6 +13,7 @@
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <WarningLevel>4</WarningLevel>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
@@ -25,7 +26,6 @@
     <MapFileExtensions>true</MapFileExtensions>
     <ApplicationRevision>0</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
-    <IsWebBootstrapper>false</IsWebBootstrapper>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
@@ -48,15 +48,23 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject>ObdExpress.App</StartupObject>
+  </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Accessibility" />
     <Reference Include="EntityFramework">
       <HintPath>..\packages\EntityFramework.5.0.0\lib\net45\EntityFramework.dll</HintPath>
     </Reference>
+    <Reference Include="PresentationUI, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="ReachFramework" />
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Data" />
     <Reference Include="System.Data.Entity" />
+    <Reference Include="System.Deployment" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Printing" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Security" />
     <Reference Include="System.Windows.Forms" />
@@ -68,6 +76,8 @@
     <Reference Include="System.Xaml">
       <RequiredTargetFramework>4.0</RequiredTargetFramework>
     </Reference>
+    <Reference Include="UIAutomationProvider" />
+    <Reference Include="UIAutomationTypes" />
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
@@ -95,9 +105,33 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="ObdExpressModel.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ObdExpressModel.edmx</DependentUpon>
+    </Compile>
+    <Compile Include="Ui\DataStructures\PanelPropertyOption.cs" />
+    <Compile Include="Ui\DataStructures\Plugin.cs" />
+    <Compile Include="Ui\UserControls\ConfigurationPanels\ConnectionSettingsPanel.xaml.cs">
+      <DependentUpon>ConnectionSettingsPanel.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Ui\UserControls\HomePanels\VehicleInformationPanelProperties.xaml.cs">
+      <DependentUpon>VehicleInformationPanelProperties.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Ui\Windows\PluginManager.xaml.cs">
+      <DependentUpon>PluginManager.xaml</DependentUpon>
+    </Compile>
     <Page Include="Ui\StyleDictionary.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Ui\UserControls\ConfigurationPanels\ConnectionSettingsPanel.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Ui\UserControls\HomePanels\VehicleInformationPanelProperties.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="Ui\UserControls\HomePanels\DashboardPanelProperties.xaml">
       <SubType>Designer</SubType>
@@ -115,15 +149,23 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Ui\UserControls\RegisteredPanel.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="Ui\UserControls\SideNavigationBar.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Ui\Windows\Elm327Connector.xaml">
+    <Page Include="Ui\UserControls\TroubleCodePanels\TroubleCodePanel.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Ui\Windows\ELM327Connector.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Ui\Windows\LoggingConsole.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Ui\Windows\LoggingConsoleConfig.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -135,29 +177,19 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="EntityModel.Context.cs">
+    <Compile Include="Global\LogTapAppender.cs" />
+    <Compile Include="Properties\ApplicationSettings.Designer.cs">
       <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>EntityModel.Context.tt</DependentUpon>
-    </Compile>
-    <Compile Include="EntityModel.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>EntityModel.tt</DependentUpon>
-    </Compile>
-    <Compile Include="EntityModel.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>EntityModel.edmx</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <DependentUpon>ApplicationSettings.settings</DependentUpon>
     </Compile>
     <Compile Include="Global\Delegates.cs" />
     <Compile Include="Global\ELM327Connection.cs" />
     <Compile Include="Global\Variables.cs" />
-    <Compile Include="Ui\DataStructures\DashboardItem.cs" />
+    <Compile Include="Ui\DataStructures\DataItem.cs" />
     <Compile Include="Ui\DataStructures\MenuItem.cs" />
     <Compile Include="Ui\DataStructures\NavigationMenu.cs" />
     <Compile Include="Ui\DataStructures\TopMenu.cs" />
-    <Compile Include="Global\Threads\Delegates.cs" />
     <Compile Include="Ui\UserControls\HomePanels\DashboardPanelProperties.xaml.cs">
       <DependentUpon>DashboardPanelProperties.xaml</DependentUpon>
     </Compile>
@@ -167,23 +199,37 @@
     <Compile Include="Ui\UserControls\HomePanels\DashboardPanel.xaml.cs">
       <DependentUpon>DashboardPanel.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Ui\UserControls\Interfaces\IPanelCollection.cs" />
     <Compile Include="Ui\UserControls\Interfaces\IRegisteredPanel.cs" />
     <Compile Include="Ui\UserControls\NavigationButton.xaml.cs">
       <DependentUpon>NavigationButton.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Ui\UserControls\RegisteredPanel.xaml.cs">
-      <DependentUpon>RegisteredPanel.xaml</DependentUpon>
-    </Compile>
+    <Compile Include="Ui\UserControls\PanelCollections\ConfigurationPanelCollection.cs" />
+    <Compile Include="Ui\UserControls\PanelCollections\HomePanelCollection.cs" />
+    <Compile Include="Ui\UserControls\PanelCollections\TroubleCodePanelCollection.cs" />
     <Compile Include="Ui\UserControls\SideNavigationBar.xaml.cs">
       <DependentUpon>SideNavigationBar.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Ui\Windows\Elm327Connector.xaml.cs">
-      <DependentUpon>Elm327Connector.xaml</DependentUpon>
+    <Compile Include="Ui\UserControls\TroubleCodePanels\TroubleCodePanel.xaml.cs">
+      <DependentUpon>TroubleCodePanel.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Ui\Windows\ELM327Connector.xaml.cs">
+      <DependentUpon>ELM327Connector.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Ui\Windows\LoggingConsole.xaml.cs">
+      <DependentUpon>LoggingConsole.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Ui\Windows\LoggingConsoleConfig.xaml.cs">
+      <DependentUpon>LoggingConsoleConfig.xaml</DependentUpon>
     </Compile>
     <Compile Include="Ui\Windows\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="Ui\Windows\PluginManager.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">
@@ -194,41 +240,30 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="Properties\Settings.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Settings.settings</DependentUpon>
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
-    </Compile>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <EntityDeploy Include="EntityModel.edmx">
+    <EntityDeploy Include="ObdExpressModel.edmx">
       <Generator>EntityModelCodeGenerator</Generator>
-      <LastGenOutput>EntityModel.Designer.cs</LastGenOutput>
+      <LastGenOutput>ObdExpressModel.Designer.cs</LastGenOutput>
     </EntityDeploy>
-    <None Include="EntityModel.Context.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <DependentUpon>EntityModel.edmx</DependentUpon>
-      <LastGenOutput>EntityModel.Context.cs</LastGenOutput>
+    <None Include="ObdExpressModel.edmx.diagram">
+      <DependentUpon>ObdExpressModel.edmx</DependentUpon>
     </None>
-    <None Include="EntityModel.edmx.diagram">
-      <DependentUpon>EntityModel.edmx</DependentUpon>
-    </None>
-    <None Include="EntityModel.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <DependentUpon>EntityModel.edmx</DependentUpon>
-      <LastGenOutput>EntityModel.cs</LastGenOutput>
+    <None Include="ObdExpressModel.edmx.sqlce" />
+    <None Include="Properties\ApplicationSettings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>ApplicationSettings.Designer.cs</LastGenOutput>
     </None>
     <None Include="packages.config" />
-    <None Include="Properties\Settings.settings">
-      <Generator>SettingsSingleFileGenerator</Generator>
-      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
-    </None>
     <AppDesigner Include="Properties\" />
+    <None Include="Properties\DataSources\ObdExpressEntities.datasource" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
+    <None Include="App.config">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Ui\Images\home_32.png" />
@@ -243,12 +278,8 @@
     <Resource Include="Ui\Images\down_arrow_512.png" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Ui\Screens\" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="ObdExpress.sdf">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
+    <Resource Include="Ui\Images\down64.png" />
+    <Resource Include="Ui\Images\up64.png" />
     <Resource Include="Ui\Images\48x48icon.png" />
     <Resource Include="Ui\Images\delete32.png" />
     <Resource Include="Ui\Images\success32.png" />
@@ -289,6 +320,36 @@
       <Project>{5b69719c-ac9c-463e-acce-8c2b3fdc6c96}</Project>
       <Name>ELM327API</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Ui\Images\Gnome-Edit-Clear-32.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Ui\Images\Gnome-Edit-Copy-32.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Ui\Images\Gnome-Document-Save-32.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Ui\Images\Gnome-Utilities-Terminal-32.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Ui\Images\Gnome-Media-Playback-Start-32.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Ui\Images\Gnome-Media-Playback-Stop-32.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Ui\Images\Gnome-Window-Close-32.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Ui\Images\Gnome-Edit-Select-All-32.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Ui\Images\Gnome-Document-Page-Setup-32.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Ui\Images\Gnome-Go-Bottom-32.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

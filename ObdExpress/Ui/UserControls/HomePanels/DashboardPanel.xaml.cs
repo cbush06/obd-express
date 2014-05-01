@@ -1,25 +1,14 @@
 ﻿using ObdExpress.Ui.DataStructures;
-using ObdExpress.Global.Threads;
 using ObdExpress.Global;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using ObdExpress.Ui.UserControls.Interfaces;
 using System.ComponentModel;
 using ObdExpress.Ui.Windows;
+using System.IO.Ports;
+using ELM327API.Processing.DataStructures;
+using System.Windows.Controls;
+using System;
 
 namespace ObdExpress.Ui.UserControls.HomePanels
 {
@@ -28,34 +17,11 @@ namespace ObdExpress.Ui.UserControls.HomePanels
     /// </summary>
     public partial class DashboardPanel : UserControl, IRegisteredPanel, INotifyPropertyChanged
     {
-        public const short REGISTERED_EVENT_TYPE_REMOVE_PANEL = 0x0000;
-        public const short REGISTERED_EVENT_TYPE_START_MONITORING = 0x0001;
-        public const short REGISTERED_EVENT_TYPE_STOP_MONITORING = 0x0002;
-
-        private bool _isMonitoring = false;
-
-        private DashboardItem item4 = new DashboardItem();
-        private DashboardItem item3 = new DashboardItem();
-        private DashboardItem item2 = new DashboardItem();
-        private DashboardItem item1 = new DashboardItem();
-
-        private Thread testThread;
-
-        /// <summary>
-        /// Title shown.
-        /// </summary>
-        public string Title
-        {
-            get
-            {
-                return "Dashboard";
-            }
-        }
-
+        
         /// <summary>
         /// Sets the number of columns shown.
         /// </summary>
-        private int _columns = 3;
+        private int _columns = 0;
         public int Columns
         {
             get
@@ -70,10 +36,27 @@ namespace ObdExpress.Ui.UserControls.HomePanels
         }
 
         /// <summary>
+        /// Sets the number of rows shown.
+        /// </summary>
+        private int _rows = 0;
+        public int Rows
+        {
+            get
+            {
+                return this._rows;
+            }
+            set
+            {
+                this._rows = value;
+                this.OnPropertyChanged("Rows");
+            }
+        }
+
+        /// <summary>
         /// The items displayed in this DashbaordPanel.
         /// </summary>
-        private ObservableCollection<DashboardItem> _dashboardItems = new ObservableCollection<DashboardItem>();
-        public ObservableCollection<DashboardItem> DashboardItems
+        private ObservableCollection<DataItem> _dashboardItems = new ObservableCollection<DataItem>();
+        public ObservableCollection<DataItem> DashboardItems
         {
             get
             {
@@ -82,109 +65,63 @@ namespace ObdExpress.Ui.UserControls.HomePanels
         }
 
         /// <summary>
-        /// Event called when the Remove menu item is selected.
+        /// Event called when this panel should be hidden.
         /// </summary>
-        private event RoutedEventHandler Remove;
+        private event RoutedEventHandler Hide;
 
         /// <summary>
-        /// Event called when the Start Monitoring menu item is selected.
+        /// Event called when this panel should be shown.
         /// </summary>
-        private event RoutedEventHandler StartMonitoringEvent;
+        private event RoutedEventHandler Show;
 
         /// <summary>
-        /// Event called when the Stop Monitoring menu item is selected.
+        /// Create a new Dashboard Panel.
         /// </summary>
-        private event RoutedEventHandler StopMonitoringEvent;
-
         public DashboardPanel()
         {
-            item1.Unit = "MPH";
-            item1.Value = "25";
-
-            item2.Unit = "RPM";
-            item2.Value = "2500";
-
-            item3.Unit = "F";
-            item3.Value = "300";
-
-            item4.Unit = "OIL";
-            item4.Value = "60";
-
-            this._dashboardItems.Add(item1);
-            this._dashboardItems.Add(item2);
-            this._dashboardItems.Add(item3);
-            this._dashboardItems.Add(item4);
-
             InitializeComponent();
-        }
 
-        private void UpdateMph(string value)
-        {
-            this.item1.Value = value;
-        }
-
-        public void TestRoutine()
-        {
-            int speed = 0;
-
-            while (true)
+            // Load the Dashboard Items in Order and Show the ones Selected in the Application Settings
+            foreach (String nextHandlerName in ((String)Properties.ApplicationSettings.Default[Variables.SETTINGS_DASHBOARD_HANDLERS]).Split(Variables.SETTINGS_SEPARATOR))
             {
-                for (speed = 0; speed < 101; speed++)
+                String actualHandlerName = String.Copy(nextHandlerName);
+
+                if (actualHandlerName.Length > 0)
                 {
-                    this.Dispatcher.Invoke(new Delegates.UITextUpdateDelegate(this.UpdateMph), String.Format("{0:D}", speed));
-                    try
+                    if (actualHandlerName[0] == '+')
                     {
-                        Thread.Sleep(10);
-                    }
-                    catch (ThreadAbortException e)
-                    {
-                        return;
-                    }
-                    catch (ThreadInterruptedException e)
-                    {
-                        return;
-                    }
+                        actualHandlerName = actualHandlerName.Substring(1);
 
-                    if (Variables.ShouldClose || !this._isMonitoring)
-                    {
-                        return;
-                    }
-                }
+                        for (int i = 0; i < ELM327Connection.LoadedHandlerTypes.Count; i++)
+                        {
+                            Type nextHandlerType = ELM327Connection.LoadedHandlerTypes[i];
 
-                for (; speed > -1; speed--)
-                {
-                    this.Dispatcher.Invoke(new Delegates.UITextUpdateDelegate(this.UpdateMph), String.Format("{0:D}", speed));
-                    try
-                    {
-                        Thread.Sleep(10);
-                    }
-                    catch (ThreadAbortException e)
-                    {
-                        return;
-                    }
-                    catch (ThreadInterruptedException e)
-                    {
-                        return;
-                    }
-
-                    if (Variables.ShouldClose || !this._isMonitoring)
-                    {
-                        return;
+                            if (nextHandlerType.Name.Equals(actualHandlerName))
+                            {
+                                DataItem newDashboardItem = new DataItem(nextHandlerType);
+                                newDashboardItem.Position = _dashboardItems.Count;
+                                _dashboardItems.Add(newDashboardItem);
+                            }
+                        }
                     }
                 }
             }
+
+            // Set the Columns Property based on Application Settings
+            this.Columns = (int)Properties.ApplicationSettings.Default[Variables.SETTINGS_DASHBOARD_COLUMNS];
+
+            // Set the Rows Property
+            this.Rows = (int)(Math.Ceiling((double)_dashboardItems.Count / (double)this.Columns));
+
+            ELM327Connection.ConnectionEstablishedEvent += StartMonitoring;
+            ELM327Connection.ConnectionClosingEvent += StopMonitoring;
         }
 
-        private void menItemStartMonitoring_Click(object sender, RoutedEventArgs e)
-        {
-            this.StartMonitoring();
-        }
-
-        private void menItemStopMonitoring_Click(object sender, RoutedEventArgs e)
-        {
-            this.StopMonitoring();
-        }
-
+        /// <summary>
+        /// Show the Properties Dialog to edit Dashboard Panel items.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void menItemProperties_Click(object sender, RoutedEventArgs e)
         {
             DashboardPanelProperties props = new DashboardPanelProperties(this);
@@ -193,37 +130,111 @@ namespace ObdExpress.Ui.UserControls.HomePanels
             props.ShowDialog();
         }
 
+        /// <summary>
+        /// Alert this Panel's parent that the user has removed it.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void menItemRemove_Click(object sender, RoutedEventArgs e)
         {
-            this.Visibility = Visibility.Hidden;
+            if (this.Hide != null)
+            {
+                this.Hide(this, new RoutedEventArgs(e.RoutedEvent, this));
+            }
         }
 
         #region IRegisteredPanel Implementation
-        public void StartMonitoring()
+        public string Title
         {
-            if (this.testThread == null || !(this.testThread.IsAlive))
+            get
             {
-                this._isMonitoring = true;
-                this.testThread = new Thread(new ThreadStart(this.TestRoutine));
-                this.testThread.Start();
+                return "Dashboard";
+            }
+        }
 
-                if (this.StartMonitoringEvent != null)
+        private bool _isShown = true;
+        public bool IsShown
+        {
+            get
+            {
+                return _isShown;
+            }
+        }
+
+        private bool _isPaused = false;
+        public bool IsPaused
+        {
+            get
+            {
+                return _isPaused;
+            }
+        }
+
+        public void ShowPanel(object sender, RoutedEventArgs e)
+        {
+            _isShown = true;
+            if (this.Show != null)
+            {
+                this.Show(this, e);
+            }
+
+            // Start Monitoring since this Panel will now be shown
+            this.StartMonitoring(null);
+        }
+
+        public void HidePanel(object sender, RoutedEventArgs e)
+        {
+            _isShown = false;
+            if (this.Hide != null)
+            {
+                this.Hide(this, e);
+            }
+
+            // Stop Monitoring since this Panel will no longer be shown
+            this.StopMonitoring();
+        }
+
+        public void StartMonitoring(SerialPort s)
+        {
+            foreach (DataItem d in this._dashboardItems)
+            {
+                if (ELM327Connection.ELM327Device != null)
                 {
-                    this.StartMonitoringEvent(this, null);
+                    ELM327Connection.ELM327Device.RegisterListener(d.HandlerType.Name, this.Update);
                 }
             }
         }
 
         public void StopMonitoring()
         {
-            if (this.testThread != null && this.testThread.IsAlive)
+            foreach (DataItem d in this._dashboardItems)
             {
-                this.testThread.Abort();
-                this._isMonitoring = false;
-
-                if (this.StopMonitoringEvent != null)
+                if (ELM327Connection.ELM327Device != null)
                 {
-                    this.StopMonitoringEvent(this, null);
+                    ELM327Connection.ELM327Device.UnregisterListener(d.HandlerType.Name, this.Update);
+                }
+            }
+        }
+        
+        public void PauseMonitoring()
+        {
+            _isPaused = true;
+            StopMonitoring();
+        }
+
+        public void UnPauseMonitoring()
+        {
+            _isPaused = false;
+            StartMonitoring(null);
+        }
+
+        public void Update(ELM327ListenerEventArgs e)
+        {
+            foreach (DataItem d in this._dashboardItems)
+            {
+                if(d.HandlerType.Equals(e.Handler.GetType()))
+                {
+                    d.Value = e.ProcessedResponse.ToString();
                 }
             }
         }
@@ -232,21 +243,15 @@ namespace ObdExpress.Ui.UserControls.HomePanels
         {
             switch (EVENT_HANDLER_TYPE)
             {
-                case DashboardPanel.REGISTERED_EVENT_TYPE_REMOVE_PANEL:
+                case Variables.REGISTERED_EVENT_TYPE_HIDE_PANEL:
                     {
-                        this.Remove += ROUTED_EVENT_HANDLER;
+                        this.Hide += ROUTED_EVENT_HANDLER;
                         break;
                     }
 
-                case DashboardPanel.REGISTERED_EVENT_TYPE_START_MONITORING:
+                case Variables.REGISTERED_EVENT_TYPE_SHOW_PANEL:
                     {
-                        this.StartMonitoringEvent += ROUTED_EVENT_HANDLER;
-                        break;
-                    }
-
-                case DashboardPanel.REGISTERED_EVENT_TYPE_STOP_MONITORING:
-                    {
-                        this.StopMonitoringEvent += ROUTED_EVENT_HANDLER;
+                        this.Show += ROUTED_EVENT_HANDLER;
                         break;
                     }
             }
@@ -256,21 +261,15 @@ namespace ObdExpress.Ui.UserControls.HomePanels
         {
             switch (EVENT_HANDLER_TYPE)
             {
-                case DashboardPanel.REGISTERED_EVENT_TYPE_REMOVE_PANEL:
+                case Variables.REGISTERED_EVENT_TYPE_HIDE_PANEL:
                     {
-                        this.Remove -= ROUTED_EVENT_HANDLER;
+                        this.Hide -= ROUTED_EVENT_HANDLER;
                         break;
                     }
 
-                case DashboardPanel.REGISTERED_EVENT_TYPE_START_MONITORING:
+                case Variables.REGISTERED_EVENT_TYPE_SHOW_PANEL:
                     {
-                        this.StartMonitoringEvent -= ROUTED_EVENT_HANDLER;
-                        break;
-                    }
-
-                case DashboardPanel.REGISTERED_EVENT_TYPE_STOP_MONITORING:
-                    {
-                        this.StopMonitoringEvent -= ROUTED_EVENT_HANDLER;
+                        this.Show -= ROUTED_EVENT_HANDLER;
                         break;
                     }
             }

@@ -20,6 +20,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -28,6 +29,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -44,15 +46,19 @@
     <Compile Include="Connection\Classes\MetaConnector.cs" />
     <Compile Include="Connection\Classes\PortConnector.cs" />
     <Compile Include="Connection\Interfaces\IConnector.cs" />
+    <Compile Include="Global\ConnectionSettings.cs" />
     <Compile Include="Global\Delegates.cs" />
+    <Compile Include="Global\ProtocolProcessingException.cs" />
+    <Compile Include="Global\Utility.cs" />
     <Compile Include="Global\Variables.cs" />
     <Compile Include="Processing\Controllers\ELM327.cs" />
-    <Compile Include="Processing\Controllers\IOThread.cs" />
     <Compile Include="Processing\Controllers\WatchdogThread.cs" />
     <Compile Include="Processing\DataStructures\ELM327ListenerEventArgs.cs" />
     <Compile Include="Processing\DataStructures\HandlerWrapper.cs" />
+    <Compile Include="Processing\DataStructures\Response.cs" />
     <Compile Include="Processing\Interfaces\IHandler.cs" />
     <Compile Include="Processing\Interfaces\IProtocol.cs" />
+    <Compile Include="Processing\Protocols\CAN_11_Bit_ISO15765_Protocol.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -61,9 +67,7 @@
       <Name>log4net.vs2010</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Processing\Protocols\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

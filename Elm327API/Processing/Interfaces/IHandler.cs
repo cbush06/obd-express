@@ -1,4 +1,4 @@
-﻿using ELM327API.Global;
+﻿using ELM327API;
 using ELM327API.Processing.DataStructures;
 using System;
 using System.Collections.Generic;
@@ -22,15 +22,27 @@ namespace ELM327API.Processing.Interfaces
         string Name { get; }
 
         /// <summary>
-        /// The body of the request frame (everything after the header).
+        /// The body of the request frame (everything after the header). Normally, the SID and PID concatenated together will suffice.
         /// </summary>
         string Request { get; }
+
+        /// <summary>
+        /// This property specifies which section of OBD Express each handler should be made available to.
+        /// </summary>
+        HandlerCategory Category { get; }
+
+        /// <summary>
+        /// Does the value retrieved by this handler change? For some values (e.g. VIN number), the answer is no. Setting this property
+        /// to FALSE will tell the ELM327 controller to only retrieve this value once each time a listener registers for it. There is no
+        /// need to clog the IO bus with queries for values that do not change.
+        /// </summary>
+        bool IsMutable { get; }
 
         /// <summary>
         /// The unit(s) of measure for the data being retrieved. It is recommended that this be the abbreviation, as the UI may use this property
         /// as a suffix to any values received from this Handler as they are displayed to the user.
         /// </summary>
-        string Units { get; }
+        string Unit { get; }
 
         /// <summary>
         /// Specifies the datatype of the response after it has been processed by this handler. Components of the application that analyze inputs
@@ -49,6 +61,26 @@ namespace ELM327API.Processing.Interfaces
         string Header { get; }
 
         /// <summary>
+        /// Indicates if this is an OBD Diagnostic request.
+        /// </summary>
+        bool IsOBD { get; }
+
+        /// <summary>
+        /// The Service Identifier if this is an OBD message handler.
+        /// </summary>
+        byte OBDSID { get; }
+
+        /// <summary>
+        /// The Parameter Identifier if this is an OBD message handler.
+        /// </summary>
+        byte OBDPID { get; }
+
+        /// <summary>
+        /// Indicates if the Protocol processor should wait for a response to this handler's request.
+        /// </summary>
+        bool ExpectsResponse { get; }
+
+        /// <summary>
         /// True if this handler has registerd listeners. This is used to add/remove it from the IO queue automatically, as needed.
         /// </summary>
         bool HasRegisteredListeners { get; }
@@ -59,15 +91,9 @@ namespace ELM327API.Processing.Interfaces
         bool HasRegisteredSingleListeners { get; }
 
         /// <summary>
-        /// True if this handler has been enqueued to execute only one request/response cycle and then quit. False, if
-        /// this handler has been enqueued  to execute the request/response cycle as long as it has registered listeners.
-        /// </summary>
-        bool IsRealtime { get; set; }
-
-        /// <summary>
         /// Indicates if this handler is compatible with one or all of the protocols.
         /// </summary>
-        Protocols Compatibility { get; }
+        ProtocolsEnum Compatibility { get; }
 
         #endregion
 
@@ -92,18 +118,10 @@ namespace ELM327API.Processing.Interfaces
         void RegisterSingleListener(Action<ELM327ListenerEventArgs> callback);
 
         /// <summary>
-        /// Determines if a callback is already a registered listener of this Handler. For this to return true, the callback must be a reference
-        /// to the same method as the callback already registered on this Handler.
-        /// </summary>
-        /// <param name="callback">The listener in question.</param>
-        /// <returns>True if the listener is already registered; otherwise, false.</returns>
-        bool IsListenerRegistered( Action<ELM327ListenerEventArgs> callback );
-
-        /// <summary>
         /// Processes a repsonse and broadcasts the results to registered listeners.
         /// </summary>
         /// <param name="response">The unprocessed response received from the ELM327.</param>
-        void ProcessResponse( string response );
+        void ProcessResponse(byte[] data);
 
         #endregion
     }

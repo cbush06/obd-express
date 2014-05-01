@@ -35,23 +35,6 @@ namespace ELM327API.Processing.DataStructures
         {
             get
             {
-                // We use lazy instantiation here to conserve resources; therefore, we must
-                // check to see if the handler has been instantiated (as a result of the 
-                // application attempting to use this handler previously).
-                if (this._handler == null)
-                {
-                    try
-                    {
-                        // Use a little "reflection glue" here to instantiate an unknown type
-                        // dynamically.
-                        this._handler = (IHandler)Activator.CreateInstance(this._handlerType);
-                    }
-                    catch (Exception e)
-                    {
-                        log.Error("Exception thrown while attempting to create object from Type [" + this._handlerType.AssemblyQualifiedName + "].", e);
-                        return null;
-                    }
-                }
                 return this._handler;
             }
         }
@@ -59,12 +42,33 @@ namespace ELM327API.Processing.DataStructures
         /// <summary>
         /// Stores the name of this Handler.
         /// </summary>
-        private string _name;
         public string Name
         {
             get
             {
-                return this._name;
+                return this._handler.Name;
+            }
+        }
+
+        /// <summary>
+        /// Stores the unit of measure.
+        /// </summary>
+        public string Unit
+        {
+            get
+            {
+                return this._handler.Unit;
+            }
+        }
+
+        /// <summary>
+        /// Stores the category of this Handler.
+        /// </summary>
+        public HandlerCategory HandlerCategory
+        {
+            get
+            {
+                return this._handler.Category;
             }
         }
 
@@ -80,9 +84,8 @@ namespace ELM327API.Processing.DataStructures
             {
                 try
                 {
-                    // Now that we have verified it, we need to retrieve our static Name property from the
-                    // type (also using reflection) and populate the fields of this wrapper with those values.
-                    this._name = (string)handlerType.GetProperty("Name").GetValue(null);
+                    // Create the handler
+                    this._handler = (IHandler)Activator.CreateInstance(handlerType);
 
                     // Store a reference to this type so that we may instantiante it the first time it is requested
                     this._handlerType = handlerType;

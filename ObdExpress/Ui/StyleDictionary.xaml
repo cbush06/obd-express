@@ -23,4 +23,33 @@
         <Setter Property="DockPanel.Dock" Value="Top" />
         <Setter Property="Padding" Value="0,4,0,4" />
     </Style>
+    
+    <!-- Set Height and Add Disabled Look to Toolbar Buttons -->
+    <Style x:Key="ToolbarButtons" TargetType="ButtonBase">
+        <Setter Property="Height" Value="27" />
+        <Style.Triggers>
+            <Trigger Property="IsEnabled" Value="false">
+                <Setter Property="Opacity" Value="0.5" />
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="true">
+                <Setter Property="Opacity" Value="1.0" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <!-- Set Height and Add Disabled Look to Toolbar Buttons -->
+    <Style x:Key="ToolbarButtonsBig" TargetType="ButtonBase">
+        <Setter Property="Height" Value="50" />
+        <Setter Property="MinWidth" Value="40" />
+        <Setter Property="Margin" Value="2,1,0,1" />
+        <Style.Triggers>
+            <Trigger Property="IsEnabled" Value="false">
+                <Setter Property="Opacity" Value="0.5" />
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="true">
+                <Setter Property="Opacity" Value="1.0" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
 </ResourceDictionary>

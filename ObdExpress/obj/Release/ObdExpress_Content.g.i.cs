@@ -8,6 +8,6 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("obdexpress.sdf")]
+[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("ui/images/gnome-go-bottom-32.png")]
 
 

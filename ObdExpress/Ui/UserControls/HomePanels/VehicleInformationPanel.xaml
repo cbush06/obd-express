@@ -4,45 +4,76 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:uc="clr-namespace:ObdExpress.Ui.UserControls"
+             xmlns:sys="clr-namespace:System;assembly=mscorlib"
+             xmlns:ports="clr-namespace:System.IO.Ports;assembly=System"
              mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="300">
+             d:DesignWidth="600">
+    <UserControl.Resources>
+        <ObjectDataProvider x:Key="parities" MethodName="GetNames" ObjectType="{x:Type sys:Enum}">
+            <ObjectDataProvider.MethodParameters>
+                <x:Type TypeName="ports:Parity" />
+            </ObjectDataProvider.MethodParameters>
+        </ObjectDataProvider>
+        <ObjectDataProvider x:Key="stopbits" MethodName="GetNames" ObjectType="{x:Type sys:Enum}">
+            <ObjectDataProvider.MethodParameters>
+                <x:Type TypeName="ports:StopBits" />
+            </ObjectDataProvider.MethodParameters>
+        </ObjectDataProvider>
+    </UserControl.Resources>
+
+    <UserControl.Background>
+        <SolidColorBrush Color="White" />
+    </UserControl.Background>
     
-    <uc:RegisteredPanel>
-        
-        <uc:RegisteredPanel.Background>
-            <SolidColorBrush Color="White" />
-        </uc:RegisteredPanel.Background>
-        
-        <uc:RegisteredPanel.Header>
-            <DockPanel>
-                <Label Content="Vehicle Information" Foreground="White" DockPanel.Dock="Left" Padding="5,4,0,4" VerticalAlignment="Center" />
-                <Menu DockPanel.Dock="Right" HorizontalAlignment="Right" Background="Transparent">
-                    <MenuItem Padding="0">
-                        <MenuItem.Header>
-                            <StackPanel Orientation="Horizontal">
-                                <Label Content="Options" Foreground="White" Padding="5,4" VerticalAlignment="Center"/>
-                                <Image Source="pack://application:,,,/ObdExpress;component/UI/Images/down_arrow_512.png" Width="16" Height="16" Stretch="Fill" />
-                            </StackPanel>
-                        </MenuItem.Header>
-                        
-                        <MenuItem Header="Remove" Click="menItemRemove_Click"/>
-                        
-                    </MenuItem>
-                </Menu>
-            </DockPanel>
-        </uc:RegisteredPanel.Header>
-        
-        <uc:RegisteredPanel.HeaderBackgroundBrush>
-            <LinearGradientBrush StartPoint="0.5,0" EndPoint="0.5,1">
-                <GradientStop Color="#FF838383" Offset="0" />
-                <GradientStop Color="#FF666666" Offset=".5" />
-                <GradientStop Color="#FF474747" Offset="1" />
-            </LinearGradientBrush>
-        </uc:RegisteredPanel.HeaderBackgroundBrush>
-        
-        <uc:RegisteredPanel.Body>
-            <Label Content="Body" />
-        </uc:RegisteredPanel.Body>
-    </uc:RegisteredPanel>
-    
+    <UserControl.Content>
+        <Border BorderBrush="Black" BorderThickness="1.0" Background="Transparent" SnapsToDevicePixels="True">
+            <Grid x:Name="MainPanelGrid" Height="Auto" HorizontalAlignment="Stretch">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <Border BorderBrush="Black" BorderThickness="0,0,0,1" Grid.Row="0" SnapsToDevicePixels="True">
+                    <Border.Background>
+                        <LinearGradientBrush StartPoint="0.5,0" EndPoint="0.5,1">
+                            <GradientStop Color="#FF838383" Offset="0" />
+                            <GradientStop Color="#FF666666" Offset=".5" />
+                            <GradientStop Color="#FF474747" Offset="1" />
+                        </LinearGradientBrush>
+                    </Border.Background>
+                    <DockPanel DataContext="{Binding Mode=OneWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}, AncestorLevel=1}}">
+                        <Label Content="{Binding Title}" Foreground="White" DockPanel.Dock="Left" Padding="5,4,0,4" VerticalAlignment="Center" />
+                        <Menu DockPanel.Dock="Right" HorizontalAlignment="Right" Background="Transparent">
+                            <MenuItem Padding="0">
+                                <MenuItem.Header>
+                                    <StackPanel Orientation="Horizontal">
+                                        <Label Content="Options" Foreground="White" Padding="5,4" VerticalAlignment="Center"/>
+                                        <Image Source="pack://application:,,,/ObdExpress;component/UI/Images/down_arrow_512.png" Width="16" Height="16" Stretch="Fill" />
+                                    </StackPanel>
+                                </MenuItem.Header>
+
+                                <MenuItem Header="Properties..." Click="Properties_Click" />
+                                <MenuItem Header="Remove" Click="HidePanel" />
+                            </MenuItem>
+                        </Menu>
+                    </DockPanel>
+                </Border>
+
+                <Border BorderBrush="Transparent" BorderThickness="0" Background="Transparent" Grid.Row="1" SnapsToDevicePixels="True">
+                    <DataGrid VerticalAlignment="Stretch" HorizontalAlignment="Stretch" HeadersVisibility="None" DataContext="{Binding Mode=OneWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}, AncestorLevel=1}}"
+                          ItemsSource="{Binding DataItems}" AutoGenerateColumns="False" CanUserAddRows="False" CanUserReorderColumns="False" IsReadOnly="True">
+                        <DataGrid.Resources>
+                            <Style TargetType="{x:Type DataGridRow}">
+                                <Setter Property="IsHitTestVisible" Value="False" />
+                            </Style>
+                        </DataGrid.Resources>
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Width="0.3*" Binding="{Binding Measure}" />
+                            <DataGridTextColumn Width="0.7*" Binding="{Binding Value}" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Border>
+            </Grid>
+        </Border>
+    </UserControl.Content>
 </UserControl>
