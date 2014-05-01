@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+  <EntityContainerMapping StorageEntityContainer="ObdExpressObdExpressDataStoreContainer" CdmEntityContainer="ObdExpressEntities">
+    <EntitySetMapping Name="TroubleCodes">
+      <EntityTypeMapping TypeName="IsTypeOf(ObdExpress.ObdExpressData.TroubleCode)">
+        <MappingFragment StoreEntitySet="TroubleCodes">
+          <ScalarProperty Name="Id" ColumnName="Id" />
+          <ScalarProperty Name="Code" ColumnName="Code" />
+          <ScalarProperty Name="Description" ColumnName="Description" />
+          <ScalarProperty Name="Address" ColumnName="Address" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+  </EntityContainerMapping>
+</Mapping>

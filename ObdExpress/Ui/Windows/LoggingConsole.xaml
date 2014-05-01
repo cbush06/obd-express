@@ -1,0 +1,94 @@
+﻿<Window x:Class="ObdExpress.Ui.Windows.LoggingConsole"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:p="clr-namespace:ObdExpress.Properties"
+        Title="Logging Console" Height="320" Width="600" 
+        WindowStartupLocation="CenterOwner" 
+        Icon="/ObdExpress;component/Ui/Images/48x48icon.png" 
+        WindowStyle="ToolWindow" ShowInTaskbar="False"
+        Closed="Window_Closed" KeyUp="Window_KeyUp">
+    <Window.Resources>
+        <!-- Import the Style Dictionary to access the Section Header Style -->
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="../StyleDictionary.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+
+    <DockPanel LastChildFill="True">
+        <StackPanel x:Name="spToolbar" Orientation="Horizontal" VerticalAlignment="Top" DockPanel.Dock="Top">
+            <StackPanel.Background>
+                <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.ControlLightColorKey}}"/>
+            </StackPanel.Background>
+
+            <Button x:Name="tbBtnStartStop" x:FieldModifier="private" ToolTip="Start Logging" Style="{StaticResource ToolbarButtonsBig}" Click="tbBtnStartStop_Click">
+                <StackPanel Orientation="Vertical">
+                    <Image x:Name="imgStartStopIcon" x:FieldModifier="private" Source="/ObdExpress;component/Ui/Images/Gnome-Media-Playback-Start-32.png" Height="27" />
+                    <AccessText x:Name="txtStartStopAccessText">Start</AccessText>
+                </StackPanel>
+            </Button>
+
+            <Border BorderThickness="1,0,0,0" BorderBrush="#FFC5C5C5" Margin="4,2,1,2" Width="2" Background="Transparent" />
+
+            <Button x:Name="tbBtnSelectAll" x:FieldModifier="private" ToolTip="Select All" Style="{StaticResource ToolbarButtonsBig}" Click="tbBtnSelectAll_Click">
+                <StackPanel Orientation="Vertical">
+                    <Image Source="/ObdExpress;component/Ui/Images/Gnome-Edit-Select-All-32.png" Height="27" />
+                    <AccessText>Select All</AccessText>
+                </StackPanel>
+            </Button>
+            <Button x:Name="tbBtnCopy" x:FieldModifier="private" ToolTip="Copy" Style="{StaticResource ToolbarButtonsBig}" Click="tbBtnCopy_Click">
+                <StackPanel Orientation="Vertical">
+                    <Image Source="/ObdExpress;component/Ui/Images/Gnome-Edit-Copy-32.png" Height="27" />
+                    <AccessText>Copy</AccessText>
+                </StackPanel>
+            </Button>
+            <Button x:Name="tbBtnClear" x:FieldModifier="private" ToolTip="Clear" Style="{StaticResource ToolbarButtonsBig}" Click="tbBtnClear_Click">
+                <StackPanel Orientation="Vertical">
+                    <Image Source="/ObdExpress;component/Ui/Images/Gnome-Edit-Clear-32.png" Height="27" />
+                    <AccessText>Clear</AccessText>
+                </StackPanel>
+            </Button>
+            <Button x:Name="tbBtnSave" x:FieldModifier="private" ToolTip="Save" Style="{StaticResource ToolbarButtonsBig}" Click="tbBtnSave_Click">
+                <StackPanel Orientation="Vertical">
+                    <Image Source="/ObdExpress;component/Ui/Images/Gnome-Document-Save-32.png" Height="27" />
+                    <AccessText>Save</AccessText>
+                </StackPanel>
+            </Button>
+
+            <Border BorderThickness="1,0,0,0" BorderBrush="#FFC5C5C5" Margin="4,2,1,2" Width="2" Background="Transparent" />
+
+            <Button x:Name="tbBtnConfigure" x:FieldModifier="private" ToolTip="Configure" Style="{StaticResource ToolbarButtonsBig}" Click="tbBtnConfigure_Click">
+                <StackPanel Orientation="Vertical">
+                    <Image Source="/ObdExpress;component/Ui/Images/Gnome-Document-Page-Setup-32.png" Height="27" />
+                    <AccessText>Configure</AccessText>
+                </StackPanel>
+            </Button>
+
+            <ToggleButton x:Name="tbBtnScrollLock" x:FieldModifier="private" ToolTip="Configure" Style="{StaticResource ToolbarButtonsBig}" Click="tbBtnScrollLock_Click">
+                <StackPanel Orientation="Vertical">
+                    <Image Source="/ObdExpress;component/Ui/Images/Gnome-Go-Bottom-32.png" Height="27" />
+                    <AccessText>Scroll Lock</AccessText>
+                </StackPanel>
+            </ToggleButton>
+
+            <Border BorderThickness="1,0,0,0" BorderBrush="#FFC5C5C5" Margin="4,2,1,2" Width="2" Background="Transparent" />
+
+            <Button x:Name="tbBtnClose" x:FieldModifier="private" ToolTip="Close" Style="{StaticResource ToolbarButtonsBig}" Click="tbBtnClose_Click">
+                <StackPanel Orientation="Vertical">
+                    <Image Source="/ObdExpress;component/Ui/Images/Gnome-Window-Close-32.png" Height="27" />
+                    <AccessText>Close</AccessText>
+                </StackPanel>
+            </Button>
+        </StackPanel>
+
+        <TextBox x:Name="txtLoggingConsole" DockPanel.Dock="Top" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" AcceptsReturn="True" AcceptsTab="True" IsReadOnlyCaretVisible="True" IsReadOnly="True" IsUndoEnabled="False">
+            <TextBox.Background>
+                <SolidColorBrush Color="{Binding Source={x:Static p:ApplicationSettings.Default}, Path=settings_console_background, Mode=OneWay}" />
+            </TextBox.Background>
+            <TextBox.Foreground>
+                <SolidColorBrush Color="{Binding Source={x:Static p:ApplicationSettings.Default}, Path=settings_console_foreground, Mode=OneWay}" />
+            </TextBox.Foreground>
+        </TextBox>
+    </DockPanel>
+</Window>

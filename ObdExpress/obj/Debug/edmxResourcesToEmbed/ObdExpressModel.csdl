@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Schema xmlns="http://schemas.microsoft.com/ado/2009/11/edm" xmlns:cg="http://schemas.microsoft.com/ado/2006/04/codegeneration" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" Namespace="ObdExpress.ObdExpressData" Alias="Self" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" annotation:UseStrongSpatialTypes="false">
+  <EntityContainer Name="ObdExpressEntities" annotation:LazyLoadingEnabled="true">
+    <EntitySet Name="TroubleCodes" EntityType="ObdExpress.ObdExpressData.TroubleCode" />
+  </EntityContainer>
+  <EntityType Name="TroubleCode">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Type="Int32" Name="Id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Type="String" Name="Code" Nullable="false" />
+    <Property Type="String" Name="Description" Nullable="false" />
+    <Property Type="Byte" Name="Address" Nullable="false" />
+  </EntityType>
+</Schema>
