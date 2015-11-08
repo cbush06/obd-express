@@ -1,0 +1,1 @@
+OBD Express is compatible with the ELM327 OBD chip. The software queries and presents real-time data from the car's bus.
