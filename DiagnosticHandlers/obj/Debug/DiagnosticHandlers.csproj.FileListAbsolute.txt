@@ -8,3 +8,13 @@ C:\Users\Clint Bush\documents\visual studio 2012\Projects\OBDExpress\DiagnosticH
 C:\Users\Clint Bush\documents\visual studio 2012\Projects\OBDExpress\DiagnosticHandlers\obj\Debug\DiagnosticHandlers.csprojResolveAssemblyReference.cache
 C:\Users\Clint Bush\documents\visual studio 2012\Projects\OBDExpress\DiagnosticHandlers\obj\Debug\DiagnosticHandlers.dll
 C:\Users\Clint Bush\documents\visual studio 2012\Projects\OBDExpress\DiagnosticHandlers\obj\Debug\DiagnosticHandlers.pdb
+C:\Users\Clint Bush\Documents\Visual Studio 2015\Projects\obd-express\DiagnosticHandlers\bin\Debug\DiagnosticHandlers.dll
+C:\Users\Clint Bush\Documents\Visual Studio 2015\Projects\obd-express\DiagnosticHandlers\bin\Debug\DiagnosticHandlers.pdb
+C:\Users\Clint Bush\Documents\Visual Studio 2015\Projects\obd-express\DiagnosticHandlers\bin\Debug\Elm327API.dll
+C:\Users\Clint Bush\Documents\Visual Studio 2015\Projects\obd-express\DiagnosticHandlers\bin\Debug\log4net.dll
+C:\Users\Clint Bush\Documents\Visual Studio 2015\Projects\obd-express\DiagnosticHandlers\bin\Debug\Elm327API.pdb
+C:\Users\Clint Bush\Documents\Visual Studio 2015\Projects\obd-express\DiagnosticHandlers\bin\Debug\log4net.pdb
+C:\Users\Clint Bush\Documents\Visual Studio 2015\Projects\obd-express\DiagnosticHandlers\bin\Debug\log4net.xml
+C:\Users\Clint Bush\Documents\Visual Studio 2015\Projects\obd-express\DiagnosticHandlers\obj\Debug\DiagnosticHandlers.csprojResolveAssemblyReference.cache
+C:\Users\Clint Bush\Documents\Visual Studio 2015\Projects\obd-express\DiagnosticHandlers\obj\Debug\DiagnosticHandlers.dll
+C:\Users\Clint Bush\Documents\Visual Studio 2015\Projects\obd-express\DiagnosticHandlers\obj\Debug\DiagnosticHandlers.pdb

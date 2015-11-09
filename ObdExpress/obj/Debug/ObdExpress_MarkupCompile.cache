@@ -4,16 +4,16 @@
 winexe
 C#
 .cs
-C:\Users\Clint Bush\documents\visual studio 2012\Projects\OBDExpress\ObdExpress\obj\Debug\
+C:\Users\Clint Bush\Documents\Visual Studio 2015\Projects\obd-express\ObdExpress\obj\Debug\
 ObdExpress
 none
 false
 DEBUG;TRACE
-C:\Users\Clint Bush\documents\visual studio 2012\Projects\OBDExpress\ObdExpress\App.xaml
+C:\Users\Clint Bush\Documents\Visual Studio 2015\Projects\obd-express\ObdExpress\App.xaml
 14370777047
 
 331589307024
-341733868226
+34-1035744029
 Ui\StyleDictionary.xaml;Ui\UserControls\ConfigurationPanels\ConnectionSettingsPanel.xaml;Ui\UserControls\HomePanels\VehicleInformationPanelProperties.xaml;Ui\UserControls\HomePanels\DashboardPanelProperties.xaml;Ui\UserControls\HomePanels\VehicleInformationPanel.xaml;Ui\UserControls\HomePanels\DashboardPanel.xaml;Ui\UserControls\NavigationButton.xaml;Ui\UserControls\SideNavigationBar.xaml;Ui\UserControls\TroubleCodePanels\TroubleCodePanel.xaml;Ui\Windows\ELM327Connector.xaml;Ui\Windows\LoggingConsole.xaml;Ui\Windows\LoggingConsoleConfig.xaml;Ui\Windows\MainWindow.xaml;Ui\Windows\PluginManager.xaml;
 
 False

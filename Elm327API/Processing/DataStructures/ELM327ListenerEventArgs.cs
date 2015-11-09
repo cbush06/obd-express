@@ -15,10 +15,7 @@ namespace ELM327API.Processing.DataStructures
         private IHandler _handler = null;
         public IHandler Handler
         {
-            get
-            {
-                return this._handler;
-            }
+            get { return this._handler; }
         }
 
         /// <summary>
@@ -45,10 +42,25 @@ namespace ELM327API.Processing.DataStructures
         private object _processedResponse = null;
         public object ProcessedResponse
         {
-            get
-            {
-                return this._processedResponse;
-            }
+            get { return this._processedResponse; }
+        }
+
+        /// <summary>
+        /// Indicates if any errors were detected in the response.
+        /// </summary>
+        private bool _isBadResponse = false;
+        public bool IsBadResponse
+        {
+            get { return _isBadResponse; }
+        }
+
+        /// <summary>
+        /// Description of any errors detected in the response.
+        /// </summary>
+        private string _responseErrors = String.Empty;
+        public string ResponseErrors
+        {
+            get { return _responseErrors; }
         }
 
         /// <summary>
@@ -60,6 +72,21 @@ namespace ELM327API.Processing.DataStructures
         {
             this._handler = handler;
             this._processedResponse = processedResponse;
+        }
+
+        /// <summary>
+        /// Creates a new ELM327ListenerEventArgs object.
+        /// </summary>
+        /// <param name="handler">The handler that generated this event.</param>
+        /// <param name="processedResponse">Processed form of the received response.</param>
+        /// <param name="isBadResponse">Indicates if any errors were detected in the response.</param>
+        /// <param name="responseErrors">Description of any errors detected in the response.</param>
+        public ELM327ListenerEventArgs(IHandler handler, object processedResponse, bool isBadResponse, string responseErrors)
+        {
+            this._handler = handler;
+            this._processedResponse = processedResponse;
+            this._isBadResponse = isBadResponse;
+            this._responseErrors = responseErrors;
         }
     }
 }

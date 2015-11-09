@@ -32,6 +32,10 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="log4net, Version=1.2.13.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
+      <HintPath>..\packages\log4net.2.0.3\lib\net40-full\log4net.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -56,18 +60,16 @@
     <Compile Include="Processing\DataStructures\ELM327ListenerEventArgs.cs" />
     <Compile Include="Processing\DataStructures\HandlerWrapper.cs" />
     <Compile Include="Processing\DataStructures\Response.cs" />
+    <Compile Include="Processing\Handlers\Constants.cs" />
+    <Compile Include="Processing\Handlers\DiagnosticSessionControlHandler.cs" />
     <Compile Include="Processing\Interfaces\IHandler.cs" />
     <Compile Include="Processing\Interfaces\IProtocol.cs" />
     <Compile Include="Processing\Protocols\CAN_11_Bit_ISO15765_Protocol.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\log4net\log4net.vs2010.csproj">
-      <Project>{181fe707-e161-4722-9f38-6aaab6faa106}</Project>
-      <Name>log4net.vs2010</Name>
-    </ProjectReference>
+    <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
