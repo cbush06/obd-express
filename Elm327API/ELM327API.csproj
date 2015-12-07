@@ -51,12 +51,14 @@
     <Compile Include="Connection\Classes\PortConnector.cs" />
     <Compile Include="Connection\Interfaces\IConnector.cs" />
     <Compile Include="Global\ConnectionSettings.cs" />
+    <Compile Include="Global\Constants.cs" />
     <Compile Include="Global\Delegates.cs" />
     <Compile Include="Global\ProtocolProcessingException.cs" />
     <Compile Include="Global\Utility.cs" />
     <Compile Include="Global\Variables.cs" />
     <Compile Include="Processing\Controllers\ELM327.cs" />
     <Compile Include="Processing\Controllers\WatchdogThread.cs" />
+    <Compile Include="Processing\DataStructures\ECU.cs" />
     <Compile Include="Processing\DataStructures\ELM327ListenerEventArgs.cs" />
     <Compile Include="Processing\DataStructures\HandlerWrapper.cs" />
     <Compile Include="Processing\DataStructures\Response.cs" />

@@ -15,7 +15,7 @@
         {
             get
             {
-                return this._portName;
+                return _portName;
             }
         }
 
@@ -26,7 +26,7 @@
         {
             get
             {
-                return this._description;
+                return _description;
             }
         }
 
@@ -37,8 +37,8 @@
         /// <param name="description">Description to be shown to the user.</param>
         public MetaConnector(string portName, string description)
         {
-            this._portName = portName;
-            this._description = description;
+            _portName = portName;
+            _description = description;
         }
 
         /// <summary>
@@ -47,7 +47,7 @@
         /// <returns></returns>
         public override string ToString()
         {
-            return this._description;
+            return _description;
         }
     }
 }

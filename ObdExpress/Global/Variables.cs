@@ -1,10 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.IO.Ports;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Media;
 
 namespace ObdExpress.Global
@@ -55,6 +51,8 @@ namespace ObdExpress.Global
         public const String SETTINGS_CONNECTION_DATABITS = "settings_connection_databits";
         public const String SETTINGS_CONNECTION_PARITY = "settings_connection_parity";
         public const String SETTINGS_CONNECTION_STOPBITS = "settings_connection_stopbits";
+        public const String SETTINGS_CONNECTION_READ_TIMEOUT = "settings_connection_read_timeout";
+        public const String SETTINGS_CONNECTION_WRITE_TIMEOUT = "settings_connection_write_timeout";
         public const String SETTINGS_CONNECTION_DEVICEDESCRIPTION = "settings_connection_devicedescription";
         public const String SETTINGS_VEHICLEINFORMATION_HANDLERS = "settings_vehicleinformation_handlers";
 

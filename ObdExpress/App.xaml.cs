@@ -3,12 +3,7 @@ using log4net;
 using ObdExpress.Global;
 using ObdExpress.Properties;
 using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Data;
-using System.Linq;
 using System.Reflection;
-using System.Threading.Tasks;
 using System.Windows;
 
 // Look at our configuration for log4net
@@ -28,8 +23,8 @@ namespace ObdExpress
 
         public App()
         {
-            this.Startup += this.OnApplicationStartup;
-            this.Exit += this.OnApplicationExit;
+            Startup += OnApplicationStartup;
+            Exit += OnApplicationExit;
         }
 
         private void OnApplicationExit(object sender, ExitEventArgs e)

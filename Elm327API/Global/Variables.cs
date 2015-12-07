@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using ELM327API.Processing.DataStructures;
 
 namespace ELM327API
 {
@@ -34,6 +30,7 @@ namespace ELM327API
     /// </summary>
     public enum CAN11BitLegislatedIdentifiers : uint
     {
+        NONE                      = 0x000,  // This option is effectively NULL for this enum
         REQ_FM_TEST_EQUIP_TO_FUNC = 0x7DF,
         REQ_FM_TEST_EQUIP_TO_ECU1 = 0x7E0,  // Recommended REQUEST ID for ECM (Engine Control Module)
         RSP_FM_ECU1_TO_TEST_EQUIP = 0x7E8,  // Recommended RESPONSE ID for ECM (Engine Control Module)

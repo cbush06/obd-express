@@ -1,18 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace ObdExpress.Ui.UserControls
 {
@@ -126,7 +116,7 @@ namespace ObdExpress.Ui.UserControls
             set
             {
                 SetValue(TypeProperty, value);
-                this.NavigationGrid_MouseLeave(this, null);
+                NavigationGrid_MouseLeave(this, null);
             }
         }
 
@@ -141,7 +131,7 @@ namespace ObdExpress.Ui.UserControls
         {
             get 
             { 
-                return this._buttonBackground; 
+                return _buttonBackground; 
             }
         }
 
@@ -153,7 +143,7 @@ namespace ObdExpress.Ui.UserControls
         {
             get
             {
-                return this._buttonForeground;
+                return _buttonForeground;
             }
         }
 
@@ -234,14 +224,14 @@ namespace ObdExpress.Ui.UserControls
             InitializeComponent();
 
             // Must call ApplyTemplate() before we can FindName()
-            this.ApplyTemplate();
+            ApplyTemplate();
 
             // Get a reference to the border so we can show and hide it
-            template = this.Template;
-            this._buttonBorder = (Border) template.FindName("ButtonBorder", this);
+            template = Template;
+            _buttonBorder = (Border) template.FindName("ButtonBorder", this);
 
             // Store the type of button this is so we can apply the correct color scheme and other properties
-            this.NavButtonType = buttonType;
+            NavButtonType = buttonType;
         }
 
         #region Event Listeners for hover actions and clicking
@@ -250,10 +240,10 @@ namespace ObdExpress.Ui.UserControls
             if (e.ChangedButton == MouseButton.Left)
             {
                 // Set the background to pressed
-                this._buttonBackground = NavigationButton._navigationButtonPressedGold;
+                _buttonBackground = NavigationButton._navigationButtonPressedGold;
 
                 // Update the display
-                this.NotifyPropertyChanged("ButtonBackground");
+                NotifyPropertyChanged("ButtonBackground");
             }
         }
 
@@ -262,15 +252,15 @@ namespace ObdExpress.Ui.UserControls
             if(e.ChangedButton == MouseButton.Left)
             {
                 // Set the background to selected/highlighted
-                this._buttonBackground = NavigationButton._navigationButtonSelectedGold;
+                _buttonBackground = NavigationButton._navigationButtonSelectedGold;
 
                 // Update the display
-                this.NotifyPropertyChanged("ButtonBackground");
+                NotifyPropertyChanged("ButtonBackground");
 
                 // Pass on the event
-                if (this.Click != null)
+                if (Click != null)
                 {
-                    this.Click(sender, e);
+                    Click(sender, e);
                 }
             }
         }
@@ -279,60 +269,60 @@ namespace ObdExpress.Ui.UserControls
         {
 
             // If it's a top-level menu button (selects a particular menu to show)
-            if (this.NavButtonType == ButtonType.MENU)
+            if (NavButtonType == ButtonType.MENU)
             {
-                this._buttonBackground = NavigationButton._navigationButtonHighlightedGold;
-                this._buttonForeground = NavigationButton._blackSolidColorBrush;
+                _buttonBackground = NavigationButton._navigationButtonHighlightedGold;
+                _buttonForeground = NavigationButton._blackSolidColorBrush;
             }
             // If it's just a menu-item
             else
             {
-                this._buttonBackground = NavigationButton._navigationButtonHighlightedGold;
-                this._buttonBorder.BorderBrush = NavigationButton._blackSolidColorBrush;
+                _buttonBackground = NavigationButton._navigationButtonHighlightedGold;
+                _buttonBorder.BorderBrush = NavigationButton._blackSolidColorBrush;
             }
 
-            this.NotifyPropertyChanged("ButtonBackground");
-            this.NotifyPropertyChanged("ButtonForeground");
+            NotifyPropertyChanged("ButtonBackground");
+            NotifyPropertyChanged("ButtonForeground");
         }
 
         private void NavigationGrid_MouseLeave(object sender, MouseEventArgs e)
         {
-            if (this.IsSelected)
+            if (IsSelected)
             {
                 // If it's a top-level menu button (selects a particular menu to show)
-                if (this.NavButtonType == ButtonType.MENU)
+                if (NavButtonType == ButtonType.MENU)
                 {
-                    this._buttonBackground = NavigationButton._navigationButtonSelectedGold;
-                    this._buttonForeground = NavigationButton._blackSolidColorBrush;
+                    _buttonBackground = NavigationButton._navigationButtonSelectedGold;
+                    _buttonForeground = NavigationButton._blackSolidColorBrush;
                 }
                 // If it's just a menu-item
                 else
                 {
-                    this._buttonBackground = NavigationButton._navigationButtonSelectedGold;
-                    this._buttonBorder.BorderBrush = NavigationButton._blackSolidColorBrush;
+                    _buttonBackground = NavigationButton._navigationButtonSelectedGold;
+                    _buttonBorder.BorderBrush = NavigationButton._blackSolidColorBrush;
                 }
 
-                this.NotifyPropertyChanged("ButtonBackground");
-                this.NotifyPropertyChanged("ButtonForeground");
+                NotifyPropertyChanged("ButtonBackground");
+                NotifyPropertyChanged("ButtonForeground");
             }
             else
             {
                 // If it's a top-level menu button (selects a particular menu to show)
-                if (this.NavButtonType == ButtonType.MENU)
+                if (NavButtonType == ButtonType.MENU)
                 {
-                    this._buttonBackground = NavigationButton._navigationButtonSelectedBlack;
-                    this._buttonForeground = NavigationButton._whiteSolidColorBrush;
+                    _buttonBackground = NavigationButton._navigationButtonSelectedBlack;
+                    _buttonForeground = NavigationButton._whiteSolidColorBrush;
                 }
                 // If it's just a menu-item
                 else
                 {
-                    this._buttonBackground = NavigationButton._navigationButtonTransparent;
-                    this._buttonBorder.BorderBrush = NavigationButton._transparentSolidColorBrush;
+                    _buttonBackground = NavigationButton._navigationButtonTransparent;
+                    _buttonBorder.BorderBrush = NavigationButton._transparentSolidColorBrush;
                 }
 
-                
-                this.NotifyPropertyChanged("ButtonBackground");
-                this.NotifyPropertyChanged("ButtonForeground");
+
+                NotifyPropertyChanged("ButtonBackground");
+                NotifyPropertyChanged("ButtonForeground");
             }
         }
         #endregion
@@ -341,9 +331,9 @@ namespace ObdExpress.Ui.UserControls
         public event PropertyChangedEventHandler PropertyChanged;
         public void NotifyPropertyChanged(string propertyName)
         {
-            if (this.PropertyChanged != null)
+            if (PropertyChanged != null)
             {
-                this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
             }
         }
         #endregion

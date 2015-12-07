@@ -1,5 +1,4 @@
-﻿using ELM327API;
-using ELM327API.Global;
+﻿using ELM327API.Global;
 using ELM327API.Processing.DataStructures;
 using ELM327API.Processing.Interfaces;
 using ELM327API.Processing.Protocols;
@@ -9,10 +8,8 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO.Ports;
-using System.Linq;
 using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace ELM327API.Processing.Controllers
 {
@@ -78,7 +75,6 @@ namespace ELM327API.Processing.Controllers
         #endregion
 
         #region Public and Protected Members
-
         /// <summary>
         /// Event called when the Watchdog detects that the connection was lost or if no response was received for a certain amount of time.
         /// </summary>
@@ -90,10 +86,17 @@ namespace ELM327API.Processing.Controllers
         private string _deviceVersion = "";
         public string DeviceVersion
         {
-            get
-            {
-                return this._deviceVersion;
-            }
+            get { return _deviceVersion; }
+        }
+
+        /// <summary>
+        /// Gets and sets the ECU that requests will be addressed to and that responses will be filtered for.
+        /// </summary>
+        private ECU _selectedEcuFilter = Constants.NoSelection;
+        public ECU SelectedEcuFilter
+        {
+            get { return _selectedEcuFilter; }
+            set { _selectedEcuFilter = value; }
         }
 
         /// <summary>
@@ -102,10 +105,7 @@ namespace ELM327API.Processing.Controllers
         private ProtocolsEnum _vehicleProtocol = ProtocolsEnum.AUTO;
         public ProtocolsEnum VehicleProtocol
         {
-            get
-            {
-                return this._vehicleProtocol;
-            }
+            get { return _vehicleProtocol; }
         }
 
         /// <summary>
@@ -114,10 +114,7 @@ namespace ELM327API.Processing.Controllers
         private bool _inOperation = false;
         public bool InOperation
         {
-            get
-            {
-                return this._inOperation;
-            }
+            get { return _inOperation; }
         }
 
         /// <summary>
@@ -125,12 +122,17 @@ namespace ELM327API.Processing.Controllers
         /// </summary>
         public SerialPort ConnectedPort
         {
-            get
-            {
-                return this._connection;
-            }
+            get { return _connection; }
         }
 
+        /// <summary>
+        /// List of ECUs that were auto-detected.
+        /// </summary>
+        private List<ECU> _responsiveEcus = new List<ECU>();
+        public List<ECU> ResponsiveEcus
+        {
+            get { return _responsiveEcus; }
+        }
         #endregion
 
         /// <summary>
@@ -157,7 +159,7 @@ namespace ELM327API.Processing.Controllers
             try
             {
                 // Discard in buffer
-                this._connection.DiscardInBuffer();
+                _connection.DiscardInBuffer();
 
                 // Write out our command and get the response
                 returnValue = DiscardInBufferWriteAndReadExisting(@"AT " + command);
@@ -195,22 +197,22 @@ namespace ELM327API.Processing.Controllers
             short protocolNumber = 0;
 
             // Ensure the connection is valid
-            if(this._connection != null && this._connection.IsOpen)
+            if(_connection != null && _connection.IsOpen)
             {
                 // Prepare the port
-                this._connection.BaudRate = _connectionSettings.BaudRate;
-                this._connection.DataBits = _connectionSettings.DataBits;
-                this._connection.Parity = _connectionSettings.Parity;
-                this._connection.StopBits = _connectionSettings.StopBits;
-                this._connection.NewLine = "\r";
-                this._connection.ReadTimeout = 100;
-                this._connection.WriteTimeout = 50;
+                _connection.BaudRate = _connectionSettings.BaudRate;
+                _connection.DataBits = _connectionSettings.DataBits;
+                _connection.Parity = _connectionSettings.Parity;
+                _connection.StopBits = _connectionSettings.StopBits;
+                _connection.NewLine = "\r";
+                _connection.ReadTimeout = 100;
+                _connection.WriteTimeout = 50;
 
                 /*
                  * Customize settings for speed and function
                  */
                 // Turn response spaces off
-                sb.Append(this.ExecuteATCommand(@"S0"));
+                sb.Append(ExecuteATCommand(@"S0"));
                 if (!(sb.ToString().Equals(@"OK")))
                 {
                     log.Error("Attempt at RESPONSE SPACES OFF [AT S0] failed. Value returned: " + sb.ToString());
@@ -219,16 +221,16 @@ namespace ELM327API.Processing.Controllers
                 sb.Clear();
 
                 // Turn linefeeds off
-                sb.Append(this.ExecuteATCommand(@"L0"));
-                if (!(sb.ToString().Equals(@"OK")))
-                {
-                    log.Error("Attempt at LINEFEEDS OFF [AT L0] failed. Value returned: " + sb.ToString());
-                    return false;
-                }
-                sb.Clear();
+                //sb.Append(this.ExecuteATCommand(@"L0"));
+                //if (!(sb.ToString().Equals(@"OK")))
+                //{
+                //    log.Error("Attempt at LINEFEEDS OFF [AT L0] failed. Value returned: " + sb.ToString());
+                //    return false;
+                //}
+                //sb.Clear();
 
                 // Echo Off
-                sb.Append(this.ExecuteATCommand(@"E0"));
+                sb.Append(ExecuteATCommand(@"E0"));
                 if (!(sb.ToString().Equals(@"OK")))
                 {
                     log.Error("Attempt at ECHO OFF [AT E0] failed. Value returned: " + sb.ToString());
@@ -237,7 +239,7 @@ namespace ELM327API.Processing.Controllers
                 sb.Clear();
 
                 // Get Device Description
-                sb.Append(this.ExecuteATCommand(@" @1"));
+                sb.Append(ExecuteATCommand(@" @1"));
                 if (!(sb.ToString().Equals(_connectionSettings.DeviceDescription)))
                 {
                     log.Error("Attempt at DEVICE DESCRIPTION [AT @1] failed. Value returned: " + sb.ToString());
@@ -246,7 +248,7 @@ namespace ELM327API.Processing.Controllers
                 sb.Clear();
 
                 // Get Version
-                sb.Append(this.ExecuteATCommand(@"I"));
+                sb.Append(ExecuteATCommand(@"I"));
                 if (sb.Length < 11)
                 {
                     log.Error("Attempt at IDENTIFY YOURSELF [AT I] failed. Value returned: " + sb.ToString());
@@ -255,7 +257,7 @@ namespace ELM327API.Processing.Controllers
                 sb.Clear();
 
                 // Set Headers on
-                sb.Append(this.ExecuteATCommand(@"H1"));
+                sb.Append(ExecuteATCommand(@"H1"));
                 if (!(sb.ToString().Equals(@"OK")))
                 {
                     log.Error("Attempt at HEADERS ON [AT H1] failed. Value returned: " + sb.ToString());
@@ -275,7 +277,7 @@ namespace ELM327API.Processing.Controllers
                 */
 
                 // Determine the protocol used by the vehicle
-                sb.Append(this.ExecuteATCommand(@"DPN"));
+                sb.Append(ExecuteATCommand(@"DPN"));
                 if (sb.Length < 1 || sb.Length > 2)
                 {
                     log.Error("Attempt at DETERMINE PROTOCOL NUMBER [AT DPN] failed. Value returned: " + sb.ToString());
@@ -292,7 +294,7 @@ namespace ELM327API.Processing.Controllers
                     // Is the character in the range 0 - 9 or A - C
                     if ((sb[protocolNumber] > 47 && sb[protocolNumber] < 58) || (sb[protocolNumber] > 64 && sb[protocolNumber] < 68))
                     {
-                        this._vehicleProtocol = (ProtocolsEnum)Convert.ToInt32(sb[protocolNumber].ToString(), 16);
+                        _vehicleProtocol = (ProtocolsEnum)Convert.ToInt32(sb[protocolNumber].ToString(), 16);
                     }
                     else
                     {
@@ -310,6 +312,24 @@ namespace ELM327API.Processing.Controllers
             return false;
         }
 
+
+
+        /// <summary>
+        /// This method cycles through the list of ECUs for the selected protocol attempting
+        /// to contact each one using the Unified Diagnostic Services (ISO 14229).
+        /// </summary>
+        public List<ECU> AutoDetectEcus()
+        {
+            List<ECU> responsiveEcus = _protocol.AutoDetectEcus();
+
+            foreach(ECU nextEcu in responsiveEcus)
+            {
+                log.Info(nextEcu.Index + ": " + nextEcu.Name);
+            }
+
+            return responsiveEcus;
+        }
+
         /// <summary>
         /// Creates a new Thread that handles processing of Input/Output with the ELM327.
         /// </summary>
@@ -323,21 +343,21 @@ namespace ELM327API.Processing.Controllers
             log.Info("Starting ELM327 IO Thread...");
 
             // Main Loop
-            while (this._continueRunningIOThread)
+            while (_continueRunningIOThread)
             {
                 // Get the next handler
-                if (!(this._monitoredHandlers.IsEmpty) && (this._monitoredHandlers.TryDequeue(out currentHandler)))
+                if (!(_monitoredHandlers.IsEmpty) && (_monitoredHandlers.TryDequeue(out currentHandler)))
                 {
+                    // Set the ECU filter
+                    _protocol.SelectedEcuFilter = _selectedEcuFilter;
+
                     // Have the current Protocol handler execute this handler's request
-                    if (!(this._protocol.Execute(currentHandler)))
-                    {
-                        log.Error("An error occurred on the ELM 327 IO Thread while executing request for Handler [" + currentHandler.Name + "].");
-                    }
+                    _protocol.Execute(currentHandler);
 
                     // If this handler still has registered listeners after its execution, enqueue it again
                     if (currentHandler.HasRegisteredListeners || currentHandler.HasRegisteredSingleListeners)
                     {
-                        this._monitoredHandlers.Enqueue(currentHandler);
+                        _monitoredHandlers.Enqueue(currentHandler);
                     }
                 }
             }
@@ -351,7 +371,7 @@ namespace ELM327API.Processing.Controllers
         /// </summary>
         private void KillIOThread()
         {
-            this._continueRunningIOThread = false;
+            _continueRunningIOThread = false;
         }
 
         /// <summary>
@@ -366,7 +386,7 @@ namespace ELM327API.Processing.Controllers
         /// </summary>
         private void KillWatchdogThread()
         {
-            this._continueRunningWatchdogThread = false;
+            _continueRunningWatchdogThread = false;
         }
 
         /// <summary>
@@ -376,39 +396,42 @@ namespace ELM327API.Processing.Controllers
         public bool StartOperations()
         {
             // Prepare the device
-            if (!(this.PrepareELM327()))
+            if (!(PrepareELM327()))
             {
                 log.Error("Error occurred while attempting to Prepare the ELM 327 device.");
                 return false;
             }
 
             // Set the correct protocol
-            switch (this._vehicleProtocol)
+            switch (_vehicleProtocol)
             {
                 case ProtocolsEnum.ISO_15765_4_CAN_11_BIT_ID_250:
                 case ProtocolsEnum.ISO_15765_4_CAN_11_BIT_ID_500:
                 case ProtocolsEnum.USER1_CAN_11_BIT_ID_125:
                 case ProtocolsEnum.USER2_CAN_11_BIT_ID_50:
                     {
-                        this._protocol = new CAN_11_Bit_ISO15765_Protocol();
+                        _protocol = new CAN_11_Bit_ISO15765_Protocol();
                         break;
                     }
                 default:
                     {
-                        log.Error("Encountered unsupported vehicle protocol while attempting to Start ELM 327 Operations: " + this._vehicleProtocol.ToString());
+                        log.Error("Encountered unsupported vehicle protocol while attempting to Start ELM 327 Operations: " + _vehicleProtocol.ToString());
                         return false;
                     }
             }
 
             // Prepare the protocol
-            this._protocol.SetConnectionProperties(this._connection, this._semaphore);
+            _protocol.SetConnectionProperties(_connection, _semaphore);
+
+            // Detect ECUs
+            _responsiveEcus = AutoDetectEcus();
 
             // Start the IO thread
-            this._ioThread = new Thread(new ThreadStart(this.SpawnIOThread));
-            this._continueRunningIOThread = true;
+            _ioThread = new Thread(new ThreadStart(SpawnIOThread));
+            _continueRunningIOThread = true;
             try
             {
-                this._ioThread.Start();
+                _ioThread.Start();
             }
             catch (Exception e)
             {
@@ -417,7 +440,7 @@ namespace ELM327API.Processing.Controllers
             }
 
             // Indicate we are in operation
-            this._inOperation = true;
+            _inOperation = true;
 
             return true;
         }
@@ -428,14 +451,14 @@ namespace ELM327API.Processing.Controllers
         public void StopOperations()
         {
             // Stop the IO and Watchdog Threads
-            this._continueRunningWatchdogThread = false;
-            this._continueRunningIOThread = false;
+            _continueRunningWatchdogThread = false;
+            _continueRunningIOThread = false;
 
             // Reset the ELM 327 device
-            this.ExecuteATCommand(@"Z");
+            ExecuteATCommand(@"Z");
 
             // Indicate we are not in operation
-            this._inOperation = false;
+            _inOperation = false;
         }
 
         /// <summary>
@@ -463,7 +486,7 @@ namespace ELM327API.Processing.Controllers
                 }
 
                 // Ensure the Handler does not already exist in the handler dictionary and add it
-                if(this._loadedHandlers.ContainsKey(handlerType.Name) || !(this._loadedHandlers.TryAdd(handlerType.Name, newHandlerWrapper)))
+                if(_loadedHandlers.ContainsKey(handlerType.Name) || !(_loadedHandlers.TryAdd(handlerType.Name, newHandlerWrapper)))
                 {
                     log.Error("An attempt was made to add a preexisting Handler to the Dictionary of loaded handlers.");
                     return false;
@@ -494,7 +517,7 @@ namespace ELM327API.Processing.Controllers
             if (typeof(IHandler).IsAssignableFrom(handlerType))
             {
                 // Ensure the Handler does not already exist in the handler dictionary and add it
-                if(!(this._loadedHandlers.ContainsKey(handlerType.Name)) || !(this._loadedHandlers.TryRemove(handlerType.Name, out oldHandlerWrapper)))
+                if(!(_loadedHandlers.ContainsKey(handlerType.Name)) || !(_loadedHandlers.TryRemove(handlerType.Name, out oldHandlerWrapper)))
                 {
                     log.Error("An attempt was made to remove a Handler from the Dictionary of loaded handlers: " + handlerType.Name);
                     return false;
@@ -517,7 +540,7 @@ namespace ELM327API.Processing.Controllers
         /// </summary>
         public void ClearHandlers()
         {
-            this._loadedHandlers.Clear();
+            _loadedHandlers.Clear();
         }
 
         /// <summary>
@@ -533,7 +556,7 @@ namespace ELM327API.Processing.Controllers
             HandlerWrapper affectedHandler = null;
 
             // Find a Handler with the provided name
-            if (!(this._loadedHandlers.TryGetValue(handlerName, out affectedHandler)))
+            if (!(_loadedHandlers.TryGetValue(handlerName, out affectedHandler)))
             {
                 log.Error("An attempt was made to register a listener on a handler that could not be found using the provided name: " + handlerName);
                 return false;
@@ -568,7 +591,7 @@ namespace ELM327API.Processing.Controllers
                 }
 
                 // Enqueue the handler with the ELM327 controller for processing
-                this._monitoredHandlers.Enqueue(affectedHandler.Handler);
+                _monitoredHandlers.Enqueue(affectedHandler.Handler);
             }
 
             return true;
@@ -586,7 +609,7 @@ namespace ELM327API.Processing.Controllers
             HandlerWrapper affectedHandler = null;
 
             // Find a Handler with the provided name
-            if (!(this._loadedHandlers.TryGetValue(handlerName, out affectedHandler)))
+            if (!(_loadedHandlers.TryGetValue(handlerName, out affectedHandler)))
             {
                 log.Error("An attempt was made to unregister a listener from a handler that could not be found using the provided name: " + handlerName);
                 return false;
@@ -610,7 +633,7 @@ namespace ELM327API.Processing.Controllers
             HandlerWrapper handlerWrapper = null;
 
             // Find a Handler with the provided name
-            if (!(this._loadedHandlers.TryGetValue(handlerName, out handlerWrapper)))
+            if (!(_loadedHandlers.TryGetValue(handlerName, out handlerWrapper)))
             {
                 log.Error("An attempt was made to enqueue a handler for an AsyncQuery that could not be found using the provided name: " + handlerName);
                 return;
@@ -620,7 +643,7 @@ namespace ELM327API.Processing.Controllers
             handlerWrapper.Handler.RegisterSingleListener(callback);
 
             // Enqueue this Handler to ensure the request is fulfilled
-            this._monitoredHandlers.Enqueue(handlerWrapper.Handler);
+            _monitoredHandlers.Enqueue(handlerWrapper.Handler);
         }
 
         /// <summary>
@@ -637,7 +660,7 @@ namespace ELM327API.Processing.Controllers
             Stopwatch stopWatch = new Stopwatch();
 
             // Find a Handler with the provided name
-            if (!(this._loadedHandlers.TryGetValue(handlerName, out handlerWrapper)))
+            if (!(_loadedHandlers.TryGetValue(handlerName, out handlerWrapper)))
             {
                 log.Error("An attempt was made to enqueue a handler for an AsyncQuery that could not be found using the provided name: " + handlerName);
                 return null;
@@ -645,8 +668,8 @@ namespace ELM327API.Processing.Controllers
 
             // Add an anonymous listener that gets the value for us
             handlerWrapper.Handler.RegisterSingleListener(
-                new Action<ELM327ListenerEventArgs>((ELM327ListenerEventArgs args) =>
-                    {
+                new Action<ELM327ListenerEventArgs>(
+                    (ELM327ListenerEventArgs args) => {
                         returnValue = args;
                     }
                 )

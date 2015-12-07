@@ -3,17 +3,8 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 using Xceed.Wpf.Toolkit;
 
 namespace ObdExpress.Ui.Windows
@@ -33,11 +24,11 @@ namespace ObdExpress.Ui.Windows
         {
             get
             {
-                return this._consoleForeground;
+                return _consoleForeground;
             }
             set
             {
-                this._consoleForeground = value;
+                _consoleForeground = value;
             }
         }
 
@@ -46,11 +37,11 @@ namespace ObdExpress.Ui.Windows
         {
             get
             {
-                return this._consoleBackground;
+                return _consoleBackground;
             }
             set
             {
-                this._consoleBackground = value;
+                _consoleBackground = value;
             }
         }
 
@@ -59,11 +50,11 @@ namespace ObdExpress.Ui.Windows
         {
             get
             {
-                return this._consoleBufferedRows;
+                return _consoleBufferedRows;
             }
             set
             {
-                this._consoleBufferedRows = value;
+                _consoleBufferedRows = value;
             }
         }
 
@@ -72,53 +63,53 @@ namespace ObdExpress.Ui.Windows
         {
             get
             {
-                return this._consoleInfiniteBuffer;
+                return _consoleInfiniteBuffer;
             }
             set
             {
                 if (value)
                 {
-                    this._consoleBufferedRows = -1;
-                    this.updBufferedRows.IsEnabled = false;
+                    _consoleBufferedRows = -1;
+                    updBufferedRows.IsEnabled = false;
                     OnPropertyChanged("ConsoleBufferedRows");
                 }
                 else
                 {
-                    this._consoleBufferedRows = 100;
-                    this.updBufferedRows.IsEnabled = true;
+                    _consoleBufferedRows = 100;
+                    updBufferedRows.IsEnabled = true;
                     OnPropertyChanged("ConsoleBufferedRows");
                 }
 
-                this._consoleInfiniteBuffer = value;
+                _consoleInfiniteBuffer = value;
             }
         }
 
         public LoggingConsoleConfig()
         {
-            this._consoleForeground = (Color)ColorConverter.ConvertFromString((String)Properties.ApplicationSettings.Default[Variables.SETTINGS_CONSOLE_FOREGROUND]);
-            this._consoleBackground = (Color)ColorConverter.ConvertFromString((String)Properties.ApplicationSettings.Default[Variables.SETTINGS_CONSOLE_BACKGROUND]);
-            this._consoleBufferedRows = (int)Properties.ApplicationSettings.Default[Variables.SETTINGS_CONSOLE_BUFFERED_ROWS];
+            _consoleForeground = (Color)ColorConverter.ConvertFromString((String)Properties.ApplicationSettings.Default[Variables.SETTINGS_CONSOLE_FOREGROUND]);
+            _consoleBackground = (Color)ColorConverter.ConvertFromString((String)Properties.ApplicationSettings.Default[Variables.SETTINGS_CONSOLE_BACKGROUND]);
+            _consoleBufferedRows = (int)Properties.ApplicationSettings.Default[Variables.SETTINGS_CONSOLE_BUFFERED_ROWS];
 
             InitializeComponent();
 
             // If buffered rows is infinite, prepare the IntegerUpDown and the checkbox
-            if (this._consoleBufferedRows < 0)
+            if (_consoleBufferedRows < 0)
             {
-                this._consoleInfiniteBuffer = true;
+                _consoleInfiniteBuffer = true;
                 OnPropertyChanged("ConsoleInfiniteBuffer");
-                this.updBufferedRows.IsEnabled = false;
+                updBufferedRows.IsEnabled = false;
             }
 
             // Build our color palette
             IEnumerator<KeyValuePair<string, Color>> standardColorEnum = Variables.STANDARD_COLORS.GetEnumerator();
             while (standardColorEnum.MoveNext())
             {
-                this._colorPalette.Add(new ColorItem(standardColorEnum.Current.Value, standardColorEnum.Current.Key));
+                _colorPalette.Add(new ColorItem(standardColorEnum.Current.Value, standardColorEnum.Current.Key));
             }
 
             // Set the color palette as the StandardColors for the two color pickers
-            this.cpForeground.StandardColors = this._colorPalette;
-            this.cpBackground.StandardColors = this._colorPalette;
+            cpForeground.StandardColors = _colorPalette;
+            cpBackground.StandardColors = _colorPalette;
         }
 
         /// <summary>
@@ -129,15 +120,15 @@ namespace ObdExpress.Ui.Windows
         private void btnDone_Click(object sender, RoutedEventArgs e)
         {
             // Update the Properties file
-            Properties.ApplicationSettings.Default[Variables.SETTINGS_CONSOLE_FOREGROUND] = this._consoleForeground.ToString();
-            Properties.ApplicationSettings.Default[Variables.SETTINGS_CONSOLE_BACKGROUND] = this._consoleBackground.ToString();
-            Properties.ApplicationSettings.Default[Variables.SETTINGS_CONSOLE_BUFFERED_ROWS] = this._consoleBufferedRows;
+            Properties.ApplicationSettings.Default[Variables.SETTINGS_CONSOLE_FOREGROUND] = _consoleForeground.ToString();
+            Properties.ApplicationSettings.Default[Variables.SETTINGS_CONSOLE_BACKGROUND] = _consoleBackground.ToString();
+            Properties.ApplicationSettings.Default[Variables.SETTINGS_CONSOLE_BUFFERED_ROWS] = _consoleBufferedRows;
 
             // Save the Properties Changes
             Properties.ApplicationSettings.Default.Save();
 
             // Close this Window
-            this.Close();
+            Close();
         }
 
         /// <summary>
@@ -147,16 +138,16 @@ namespace ObdExpress.Ui.Windows
         /// <param name="e"></param>
         private void Window_Closed(object sender, EventArgs e)
         {
-            this.Owner.Focus();
+            Owner.Focus();
         }
 
         #region INotifyPropertyChanged Members
         public event PropertyChangedEventHandler PropertyChanged;
         public void OnPropertyChanged(String propertyName)
         {
-            if (this.PropertyChanged != null)
+            if (PropertyChanged != null)
             {
-                this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
             }
         }
         #endregion

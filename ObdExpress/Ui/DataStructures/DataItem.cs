@@ -1,10 +1,6 @@
 ﻿using ELM327API.Processing.Interfaces;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ObdExpress.Ui.DataStructures
 {
@@ -21,9 +17,9 @@ namespace ObdExpress.Ui.DataStructures
         public DataItem(Type handlerType)
         {
             IHandler handler = (IHandler)Activator.CreateInstance(handlerType);
-            this._handlerType = handlerType;
-            this._measure = handler.Name;
-            this._unit = handler.Unit;
+            _handlerType = handlerType;
+            _measure = handler.Name;
+            _unit = handler.Unit;
         }
 
         /// <summary>
@@ -34,7 +30,7 @@ namespace ObdExpress.Ui.DataStructures
         {
             get
             {
-                return this._handlerType;
+                return _handlerType;
             }
         }
 
@@ -46,12 +42,12 @@ namespace ObdExpress.Ui.DataStructures
         {
             get
             {
-                return this._position;
+                return _position;
             }
             set
             {
-                this._position = value;
-                this.NotifyPropertyChanged("Position");
+                _position = value;
+                NotifyPropertyChanged("Position");
             }
         }
 
@@ -63,7 +59,7 @@ namespace ObdExpress.Ui.DataStructures
         {
             get
             {
-                return this._measure;
+                return _measure;
             }
         }
 
@@ -75,7 +71,7 @@ namespace ObdExpress.Ui.DataStructures
         {
             get
             {
-                return this._unit;
+                return _unit;
             }
         }
 
@@ -87,12 +83,12 @@ namespace ObdExpress.Ui.DataStructures
         {
             get
             {
-                return this._value;
+                return _value;
             }
             set
             {
-                this._value = value;
-                this.NotifyPropertyChanged("Value");
+                _value = value;
+                NotifyPropertyChanged("Value");
             }
         }
 
@@ -100,7 +96,7 @@ namespace ObdExpress.Ui.DataStructures
         public event PropertyChangedEventHandler PropertyChanged;
         public void NotifyPropertyChanged(string propertyName)
         {
-            if(this.PropertyChanged != null)
+            if(PropertyChanged != null)
             {
                 PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
             }

@@ -1,10 +1,6 @@
-﻿using System;
-using log4net.Appender;
+﻿using log4net.Appender;
 using log4net.Core;
-using System.Text;
 using log4net;
-using System.IO.Pipes;
-using System.IO;
 
 namespace ObdExpress.Global
 {
@@ -32,7 +28,7 @@ namespace ObdExpress.Global
             // If there are listeners, send them the message
             if (MessageLogging != null)
             {
-                MessageLogging(this.RenderLoggingEvent(loggingEvent));
+                MessageLogging(RenderLoggingEvent(loggingEvent));
             }
         }
     }

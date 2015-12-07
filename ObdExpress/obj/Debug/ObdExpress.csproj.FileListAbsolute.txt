@@ -51,9 +51,6 @@ C:\Users\Clint Bush\documents\visual studio 2012\Projects\OBDExpress\ObdExpress\
 C:\Users\Clint Bush\documents\visual studio 2012\Projects\OBDExpress\ObdExpress\obj\Debug\ObdExpress.csproj.GenerateResource.Cache
 C:\Users\Clint Bush\documents\visual studio 2012\Projects\OBDExpress\ObdExpress\obj\Debug\ObdExpress.exe
 C:\Users\Clint Bush\documents\visual studio 2012\Projects\OBDExpress\ObdExpress\obj\Debug\ObdExpress.pdb
-C:\Users\Clint Bush\Documents\Visual Studio 2015\Projects\obd-express\ObdExpress\bin\Debug\ObdExpress.exe.config
-C:\Users\Clint Bush\Documents\Visual Studio 2015\Projects\obd-express\ObdExpress\obj\Debug\ObdExpress.exe
-C:\Users\Clint Bush\Documents\Visual Studio 2015\Projects\obd-express\ObdExpress\obj\Debug\ObdExpress.pdb
 C:\Users\Clint Bush\Documents\Visual Studio 2015\Projects\obd-express\ObdExpress\obj\Debug\ObdExpress.csprojResolveAssemblyReference.cache
 C:\Users\Clint Bush\Documents\Visual Studio 2015\Projects\obd-express\ObdExpress\obj\Debug\Ui\StyleDictionary.baml
 C:\Users\Clint Bush\Documents\Visual Studio 2015\Projects\obd-express\ObdExpress\obj\Debug\Ui\UserControls\HomePanels\VehicleInformationPanelProperties.baml
@@ -73,12 +70,12 @@ C:\Users\Clint Bush\Documents\Visual Studio 2015\Projects\obd-express\ObdExpress
 C:\Users\Clint Bush\Documents\Visual Studio 2015\Projects\obd-express\ObdExpress\obj\Debug\Ui\Windows\ELM327Connector.g.cs
 C:\Users\Clint Bush\Documents\Visual Studio 2015\Projects\obd-express\ObdExpress\obj\Debug\Ui\Windows\LoggingConsole.g.cs
 C:\Users\Clint Bush\Documents\Visual Studio 2015\Projects\obd-express\ObdExpress\obj\Debug\Ui\Windows\LoggingConsoleConfig.g.cs
-C:\Users\Clint Bush\Documents\Visual Studio 2015\Projects\obd-express\ObdExpress\obj\Debug\Ui\Windows\MainWindow.g.cs
 C:\Users\Clint Bush\Documents\Visual Studio 2015\Projects\obd-express\ObdExpress\obj\Debug\Ui\Windows\PluginManager.g.cs
 C:\Users\Clint Bush\Documents\Visual Studio 2015\Projects\obd-express\ObdExpress\obj\Debug\App.g.cs
 C:\Users\Clint Bush\Documents\Visual Studio 2015\Projects\obd-express\ObdExpress\obj\Debug\GeneratedInternalTypeHelper.g.cs
 C:\Users\Clint Bush\Documents\Visual Studio 2015\Projects\obd-express\ObdExpress\obj\Debug\ObdExpress_MarkupCompile.cache
 C:\Users\Clint Bush\Documents\Visual Studio 2015\Projects\obd-express\ObdExpress\obj\Debug\ObdExpress_MarkupCompile.lref
+C:\Users\Clint Bush\Documents\Visual Studio 2015\Projects\obd-express\ObdExpress\bin\Debug\ObdExpress.exe.config
 C:\Users\Clint Bush\Documents\Visual Studio 2015\Projects\obd-express\ObdExpress\bin\Debug\ObdExpress.exe
 C:\Users\Clint Bush\Documents\Visual Studio 2015\Projects\obd-express\ObdExpress\bin\Debug\ObdExpress.pdb
 C:\Users\Clint Bush\Documents\Visual Studio 2015\Projects\obd-express\ObdExpress\bin\Debug\Elm327API.dll
@@ -93,6 +90,7 @@ C:\Users\Clint Bush\Documents\Visual Studio 2015\Projects\obd-express\ObdExpress
 C:\Users\Clint Bush\Documents\Visual Studio 2015\Projects\obd-express\ObdExpress\bin\Debug\Elm327API.pdb
 C:\Users\Clint Bush\Documents\Visual Studio 2015\Projects\obd-express\ObdExpress\bin\Debug\EntityFramework.xml
 C:\Users\Clint Bush\Documents\Visual Studio 2015\Projects\obd-express\ObdExpress\bin\Debug\log4net.xml
+C:\Users\Clint Bush\Documents\Visual Studio 2015\Projects\obd-express\ObdExpress\obj\Debug\Ui\Windows\MainWindow.g.cs
 C:\Users\Clint Bush\Documents\Visual Studio 2015\Projects\obd-express\ObdExpress\obj\Debug\Ui\UserControls\ConfigurationPanels\ConnectionSettingsPanel.baml
 C:\Users\Clint Bush\Documents\Visual Studio 2015\Projects\obd-express\ObdExpress\obj\Debug\Ui\UserControls\HomePanels\VehicleInformationPanel.baml
 C:\Users\Clint Bush\Documents\Visual Studio 2015\Projects\obd-express\ObdExpress\obj\Debug\Ui\UserControls\HomePanels\DashboardPanel.baml
@@ -103,3 +101,5 @@ C:\Users\Clint Bush\Documents\Visual Studio 2015\Projects\obd-express\ObdExpress
 C:\Users\Clint Bush\Documents\Visual Studio 2015\Projects\obd-express\ObdExpress\obj\Debug\ObdExpress.g.resources
 C:\Users\Clint Bush\Documents\Visual Studio 2015\Projects\obd-express\ObdExpress\obj\Debug\ObdExpress.Properties.Resources.resources
 C:\Users\Clint Bush\Documents\Visual Studio 2015\Projects\obd-express\ObdExpress\obj\Debug\ObdExpress.csproj.GenerateResource.Cache
+C:\Users\Clint Bush\Documents\Visual Studio 2015\Projects\obd-express\ObdExpress\obj\Debug\ObdExpress.exe
+C:\Users\Clint Bush\Documents\Visual Studio 2015\Projects\obd-express\ObdExpress\obj\Debug\ObdExpress.pdb

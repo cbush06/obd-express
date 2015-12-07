@@ -6,10 +6,10 @@ C:\Users\Clint Bush\documents\visual studio 2012\Projects\OBDExpress\Elm327API\b
 C:\Users\Clint Bush\documents\visual studio 2012\Projects\OBDExpress\Elm327API\obj\Debug\ELM327API.csprojResolveAssemblyReference.cache
 C:\Users\Clint Bush\documents\visual studio 2012\Projects\OBDExpress\Elm327API\obj\Debug\Elm327API.dll
 C:\Users\Clint Bush\documents\visual studio 2012\Projects\OBDExpress\Elm327API\obj\Debug\Elm327API.pdb
-C:\Users\Clint Bush\Documents\Visual Studio 2015\Projects\obd-express\Elm327API\obj\Debug\Elm327API.dll
-C:\Users\Clint Bush\Documents\Visual Studio 2015\Projects\obd-express\Elm327API\obj\Debug\Elm327API.pdb
 C:\Users\Clint Bush\Documents\Visual Studio 2015\Projects\obd-express\Elm327API\bin\Debug\Elm327API.dll
 C:\Users\Clint Bush\Documents\Visual Studio 2015\Projects\obd-express\Elm327API\bin\Debug\Elm327API.pdb
 C:\Users\Clint Bush\Documents\Visual Studio 2015\Projects\obd-express\Elm327API\bin\Debug\log4net.dll
 C:\Users\Clint Bush\Documents\Visual Studio 2015\Projects\obd-express\Elm327API\bin\Debug\log4net.xml
+C:\Users\Clint Bush\Documents\Visual Studio 2015\Projects\obd-express\Elm327API\obj\Debug\Elm327API.dll
+C:\Users\Clint Bush\Documents\Visual Studio 2015\Projects\obd-express\Elm327API\obj\Debug\Elm327API.pdb
 C:\Users\Clint Bush\Documents\Visual Studio 2015\Projects\obd-express\Elm327API\obj\Debug\ELM327API.csprojResolveAssemblyReference.cache

@@ -1,13 +1,16 @@
 ﻿using ELM327API.Processing.Interfaces;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using ELM327API.Processing.DataStructures;
 
 namespace ELM327API.Processing.Handlers
 {
+    /// <summary>
+    /// This Handler executes a Unified Diagnostics Service request for
+    /// the 0x10 (DiagnosticSessionControl) service and the 0x01 (defaultSession)
+    /// subfunction.
+    /// 
+    /// Reference: ISO15765-3, Section 9.2.1, pg. 42
+    /// </summary>
     class DiagnosticSessionControlHandler : IHandler
     {
         /// <summary>
@@ -55,7 +58,7 @@ namespace ELM327API.Processing.Handlers
             get { return Constants.CUSTOM_HEADER; }
         }
 
-        private string _header = CAN11BitLegislatedIdentifiers.REQ_FM_TEST_EQUIP_TO_ECU1.ToString("X3");
+        private string _header = String.Empty;
         public string Header
         {
             get { return _header; }
@@ -84,37 +87,37 @@ namespace ELM327API.Processing.Handlers
 
         public bool HasRegisteredListeners
         {
-            get { return (this.RegisteredListeners != null); }
+            get { return (RegisteredListeners != null); }
         }
 
         public bool HasRegisteredSingleListeners
         {
-            get { return (this.RegisteredSingleListeners != null); }
+            get { return (RegisteredSingleListeners != null); }
         }
 
         public ProtocolsEnum Compatibility
         {
-            get { return ProtocolsEnum.ALL; }
+            get { return ProtocolsEnum.AUTO; }
         }
 
         public void RegisterListener(Action<ELM327API.Processing.DataStructures.ELM327ListenerEventArgs> callback)
         {
             if (callback != null)
             {
-                this.RegisteredListeners += callback;
+                RegisteredListeners += callback;
             }
         }
 
         public void UnregisterListener(Action<ELM327API.Processing.DataStructures.ELM327ListenerEventArgs> callback)
         {
-            if (callback != null && this.RegisteredListeners != null)
+            if (callback != null && RegisteredListeners != null)
             {
-                this.RegisteredListeners -= callback;
+                RegisteredListeners -= callback;
             }
 
-            if (callback != null && this.RegisteredSingleListeners != null)
+            if (callback != null && RegisteredSingleListeners != null)
             {
-                this.RegisteredSingleListeners -= callback;
+                RegisteredSingleListeners -= callback;
             }
         }
 
@@ -122,7 +125,7 @@ namespace ELM327API.Processing.Handlers
         {
             if (callback != null)
             {
-                this.RegisteredSingleListeners += callback;
+                RegisteredSingleListeners += callback;
             }
         }
 
@@ -144,15 +147,15 @@ namespace ELM327API.Processing.Handlers
                 arg = new ELM327ListenerEventArgs(this, null, true, "Only " + data.Length + " bytes of data were returned. Expected 4 bytes.");
             }
 
-            if (this.RegisteredListeners != null)
+            if (RegisteredListeners != null)
             {
-                this.RegisteredListeners(arg);
+                RegisteredListeners(arg);
             }
 
-            if (this.RegisteredSingleListeners != null)
+            if (RegisteredSingleListeners != null)
             {
-                this.RegisteredSingleListeners(arg);
-                this.RegisteredSingleListeners = null;
+                RegisteredSingleListeners(arg);
+                RegisteredSingleListeners = null;
             }
         }
     }

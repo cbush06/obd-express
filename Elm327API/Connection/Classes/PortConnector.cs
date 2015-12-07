@@ -37,8 +37,8 @@ namespace ELM327API.Connection.Classes
         /// <param name="portName">The port to create this connector for.</param>
         public PortConnector(string portName, ConnectionSettings connectionSettings)
         {
-            this._portName = portName;
-            this._connectionSettings = connectionSettings;
+            _portName = portName;
+            _connectionSettings = connectionSettings;
         }
 
         public void GetSerialPort()
@@ -53,10 +53,10 @@ namespace ELM327API.Connection.Classes
 
             try
             {
-                _currentPort = new SerialPort(this._portName);
+                _currentPort = new SerialPort(_portName);
 
                 // Tell the user what we're testing
-                this.CheckingPort(this._portName);
+                CheckingPort(_portName);
 
                 // Prepare the port
                 _currentPort.BaudRate = _connectionSettings.BaudRate;
@@ -64,8 +64,8 @@ namespace ELM327API.Connection.Classes
                 _currentPort.Parity = _connectionSettings.Parity;
                 _currentPort.StopBits = _connectionSettings.StopBits;
                 _currentPort.NewLine = "\r";
-                _currentPort.ReadTimeout = 50;
-                _currentPort.WriteTimeout = 50;
+                _currentPort.ReadTimeout = _connectionSettings.ReadTimeout;
+                _currentPort.WriteTimeout = _connectionSettings.WriteTimout;
 
                 // Log the configuration
                 PortConnector.log.Info("Checking port " + _currentPort.PortName + " with parameters"
@@ -73,6 +73,8 @@ namespace ELM327API.Connection.Classes
                                             + ", DataBits = " + _currentPort.DataBits.ToString()
                                             + ", Parity = " + _currentPort.Parity.ToString()
                                             + ", StopBits = " + _currentPort.StopBits.ToString()
+                                            + ", ReadTimeout = " + _currentPort.ReadTimeout.ToString()
+                                            + ", WriteTimeout = " + _currentPort.WriteTimeout.ToString()
                                             + ", Device Identifier = " + deviceDescription);
 
                 // Open and attempt a write and read
@@ -101,8 +103,8 @@ namespace ELM327API.Connection.Classes
                 catch (TimeoutException e)
                 {
                     PortConnector.log.Error("TimeoutException has occurred. Assuming no response.", e);
-                    this.UpdateMessages("NO RESPONSE!");
-                    this.PortSuccess(false);
+                    UpdateMessages("NO RESPONSE!");
+                    PortSuccess(false);
                 }
 
                 // Parse response
@@ -111,16 +113,16 @@ namespace ELM327API.Connection.Classes
                     if (receivedDescription.Equals(deviceDescription))
                     {
                         PortConnector.log.Info("Successfully connected on port " + _currentPort.PortName + "!");
-                        this.UpdateMessages("SUCCESS!");
-                        this.PortSuccess(true);
+                        UpdateMessages("SUCCESS!");
+                        PortSuccess(true);
                         success = true;
-                        this.ConnectionEstablished(_currentPort);
+                        ConnectionEstablished(_currentPort);
                     }
                     else
                     {
                         PortConnector.log.Error("Response to [AT @1] determined to be invalid Device Identifier: " + receivedDescription);
-                        this.UpdateMessages("INVALID DEVICE NAME: " + receivedDescription);
-                        this.PortSuccess(false);
+                        UpdateMessages("INVALID DEVICE NAME: " + receivedDescription);
+                        PortSuccess(false);
                         success = false;
                     }
                 }
@@ -128,28 +130,28 @@ namespace ELM327API.Connection.Classes
             catch (IOException e)
             {
                 PortConnector.log.Error("IOException has occurred. Assuming No Device or Error.", e);
-                this.UpdateMessages("NO DEVICE OR ERROR!");
-                this.PortSuccess(false);
+                UpdateMessages("NO DEVICE OR ERROR!");
+                PortSuccess(false);
             }
             catch (InvalidOperationException e)
             {
                 PortConnector.log.Error("InvalidOperationException has occurred. Assuming No Device or Error.", e);
-                this.UpdateMessages("NO DEVICE OR ERROR!");
-                this.PortSuccess(false);
+                UpdateMessages("NO DEVICE OR ERROR!");
+                PortSuccess(false);
             }
             catch (UnauthorizedAccessException e)
             {
                 PortConnector.log.Error("UnauthorizedAccessException has occurred. Assuming No Device or Error.", e);
-                this.UpdateMessages("PORT IN USE, ACCESS DENIED!");
-                this.PortSuccess(false);
+                UpdateMessages("PORT IN USE, ACCESS DENIED!");
+                PortSuccess(false);
             }
 
             if (!success)
             {
-                this._currentPort.Close();
+                _currentPort.Close();
             }
 
-            this.ConnectionComplete(success);
+            ConnectionComplete(success);
         }
 
         /// <summary>

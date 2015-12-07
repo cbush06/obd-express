@@ -26,12 +26,12 @@ namespace ObdExpress.Ui.UserControls.HomePanels
         {
             get
             {
-                return this._columns;
+                return _columns;
             }
             set
             {
-                this._columns = value;
-                this.OnPropertyChanged("Columns");
+                _columns = value;
+                OnPropertyChanged("Columns");
             }
         }
 
@@ -43,12 +43,12 @@ namespace ObdExpress.Ui.UserControls.HomePanels
         {
             get
             {
-                return this._rows;
+                return _rows;
             }
             set
             {
-                this._rows = value;
-                this.OnPropertyChanged("Rows");
+                _rows = value;
+                OnPropertyChanged("Rows");
             }
         }
 
@@ -60,7 +60,7 @@ namespace ObdExpress.Ui.UserControls.HomePanels
         {
             get
             {
-                return this._dashboardItems;
+                return _dashboardItems;
             }
         }
 
@@ -108,10 +108,10 @@ namespace ObdExpress.Ui.UserControls.HomePanels
             }
 
             // Set the Columns Property based on Application Settings
-            this.Columns = (int)Properties.ApplicationSettings.Default[Variables.SETTINGS_DASHBOARD_COLUMNS];
+            Columns = (int)Properties.ApplicationSettings.Default[Variables.SETTINGS_DASHBOARD_COLUMNS];
 
             // Set the Rows Property
-            this.Rows = (int)(Math.Ceiling((double)_dashboardItems.Count / (double)this.Columns));
+            Rows = (int)(Math.Ceiling((double)_dashboardItems.Count / (double)Columns));
 
             ELM327Connection.ConnectionEstablishedEvent += StartMonitoring;
             ELM327Connection.ConnectionClosingEvent += StopMonitoring;
@@ -137,9 +137,9 @@ namespace ObdExpress.Ui.UserControls.HomePanels
         /// <param name="e"></param>
         private void menItemRemove_Click(object sender, RoutedEventArgs e)
         {
-            if (this.Hide != null)
+            if (Hide != null)
             {
-                this.Hide(this, new RoutedEventArgs(e.RoutedEvent, this));
+                Hide(this, new RoutedEventArgs(e.RoutedEvent, this));
             }
         }
 
@@ -173,45 +173,45 @@ namespace ObdExpress.Ui.UserControls.HomePanels
         public void ShowPanel(object sender, RoutedEventArgs e)
         {
             _isShown = true;
-            if (this.Show != null)
+            if (Show != null)
             {
-                this.Show(this, e);
+                Show(this, e);
             }
 
             // Start Monitoring since this Panel will now be shown
-            this.StartMonitoring(null);
+            StartMonitoring(null);
         }
 
         public void HidePanel(object sender, RoutedEventArgs e)
         {
             _isShown = false;
-            if (this.Hide != null)
+            if (Hide != null)
             {
-                this.Hide(this, e);
+                Hide(this, e);
             }
 
             // Stop Monitoring since this Panel will no longer be shown
-            this.StopMonitoring();
+            StopMonitoring();
         }
 
         public void StartMonitoring(SerialPort s)
         {
-            foreach (DataItem d in this._dashboardItems)
+            foreach (DataItem d in _dashboardItems)
             {
                 if (ELM327Connection.ELM327Device != null)
                 {
-                    ELM327Connection.ELM327Device.RegisterListener(d.HandlerType.Name, this.Update);
+                    ELM327Connection.ELM327Device.RegisterListener(d.HandlerType.Name, Update);
                 }
             }
         }
 
         public void StopMonitoring()
         {
-            foreach (DataItem d in this._dashboardItems)
+            foreach (DataItem d in _dashboardItems)
             {
                 if (ELM327Connection.ELM327Device != null)
                 {
-                    ELM327Connection.ELM327Device.UnregisterListener(d.HandlerType.Name, this.Update);
+                    ELM327Connection.ELM327Device.UnregisterListener(d.HandlerType.Name, Update);
                 }
             }
         }
@@ -230,7 +230,7 @@ namespace ObdExpress.Ui.UserControls.HomePanels
 
         public void Update(ELM327ListenerEventArgs e)
         {
-            foreach (DataItem d in this._dashboardItems)
+            foreach (DataItem d in _dashboardItems)
             {
                 if(d.HandlerType.Equals(e.Handler.GetType()))
                 {
@@ -245,13 +245,13 @@ namespace ObdExpress.Ui.UserControls.HomePanels
             {
                 case Variables.REGISTERED_EVENT_TYPE_HIDE_PANEL:
                     {
-                        this.Hide += ROUTED_EVENT_HANDLER;
+                        Hide += ROUTED_EVENT_HANDLER;
                         break;
                     }
 
                 case Variables.REGISTERED_EVENT_TYPE_SHOW_PANEL:
                     {
-                        this.Show += ROUTED_EVENT_HANDLER;
+                        Show += ROUTED_EVENT_HANDLER;
                         break;
                     }
             }
@@ -263,13 +263,13 @@ namespace ObdExpress.Ui.UserControls.HomePanels
             {
                 case Variables.REGISTERED_EVENT_TYPE_HIDE_PANEL:
                     {
-                        this.Hide -= ROUTED_EVENT_HANDLER;
+                        Hide -= ROUTED_EVENT_HANDLER;
                         break;
                     }
 
                 case Variables.REGISTERED_EVENT_TYPE_SHOW_PANEL:
                     {
-                        this.Show -= ROUTED_EVENT_HANDLER;
+                        Show -= ROUTED_EVENT_HANDLER;
                         break;
                     }
             }
@@ -281,9 +281,9 @@ namespace ObdExpress.Ui.UserControls.HomePanels
         public event PropertyChangedEventHandler PropertyChanged;
         public void OnPropertyChanged(string propertyName)
         {
-            if (this.PropertyChanged != null)
+            if (PropertyChanged != null)
             {
-                this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
             }
         }
 

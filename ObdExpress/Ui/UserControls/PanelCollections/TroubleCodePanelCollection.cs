@@ -1,27 +1,23 @@
 ﻿using ObdExpress.Global;
 using ObdExpress.Ui.UserControls.Interfaces;
 using ObdExpress.Ui.UserControls.TroubleCodePanels;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ObdExpress.Ui.UserControls.PanelCollections
 {
     public class TroubleCodePanelCollection : IPanelCollection
     {
         private List<IRegisteredPanel> _panels = new List<IRegisteredPanel>();
-        public List<IRegisteredPanel> Panels { get { return this._panels; } }
+        public List<IRegisteredPanel> Panels { get { return _panels; } }
 
         public TroubleCodePanelCollection()
         {
-            this._panels.Add(new TroubleCodePanel());
+            _panels.Add(new TroubleCodePanel());
         }
 
         public void OnPanelCollectionShown()
         {
-            foreach (IRegisteredPanel nextPanel in this._panels)
+            foreach (IRegisteredPanel nextPanel in _panels)
             {
                 ELM327Connection.ConnectionEstablishedEvent += nextPanel.StartMonitoring;
                 ELM327Connection.ConnectionClosingEvent += nextPanel.StopMonitoring;
@@ -36,7 +32,7 @@ namespace ObdExpress.Ui.UserControls.PanelCollections
 
         public void OnPanelCollectionHidden()
         {
-            foreach (IRegisteredPanel nextPanel in this._panels)
+            foreach (IRegisteredPanel nextPanel in _panels)
             {
                 nextPanel.StopMonitoring();
             }

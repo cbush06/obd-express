@@ -4,10 +4,8 @@ using System;
 using System.ComponentModel;
 using System.Windows;
 using log4net;
-using System.IO.Pipes;
 using System.IO;
 using System.Threading;
-using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Text;
 
@@ -36,7 +34,7 @@ namespace ObdExpress.Ui.Windows
         public LoggingConsole()
         {
             InitializeComponent();
-            this.UpdateSettings();
+            UpdateSettings();
         }
 
         ~LoggingConsole()
@@ -77,8 +75,8 @@ namespace ObdExpress.Ui.Windows
         /// <param name="e"></param>
         private void tbBtnSelectAll_Click(object sender, RoutedEventArgs e)
         {
-            this.txtLoggingConsole.Focus();
-            this.txtLoggingConsole.SelectAll();
+            txtLoggingConsole.Focus();
+            txtLoggingConsole.SelectAll();
         }
 
         /// <summary>
@@ -88,8 +86,8 @@ namespace ObdExpress.Ui.Windows
         /// <param name="e"></param>
         private void tbBtnCopy_Click(object sender, RoutedEventArgs e)
         {
-            this.txtLoggingConsole.Focus();
-            this.txtLoggingConsole.Copy();
+            txtLoggingConsole.Focus();
+            txtLoggingConsole.Copy();
         }
 
         /// <summary>
@@ -100,8 +98,8 @@ namespace ObdExpress.Ui.Windows
         private void tbBtnClear_Click(object sender, RoutedEventArgs e)
         {
             _loggingBuffer.Clear();
-            this.txtLoggingConsole.Focus();
-            this.txtLoggingConsole.Clear();
+            txtLoggingConsole.Focus();
+            txtLoggingConsole.Clear();
         }
 
         /// <summary>
@@ -160,7 +158,7 @@ namespace ObdExpress.Ui.Windows
         /// <param name="e"></param>
         private void tbBtnClose_Click(object sender, RoutedEventArgs e)
         {
-            this.Close();
+            Close();
         }
 
         /// <summary>
@@ -168,7 +166,7 @@ namespace ObdExpress.Ui.Windows
         /// </summary>
         private void UpdateSettings()
         {
-            this._consoleBufferedRows = (int)Properties.ApplicationSettings.Default[Variables.SETTINGS_CONSOLE_BUFFERED_ROWS];
+            _consoleBufferedRows = (int)Properties.ApplicationSettings.Default[Variables.SETTINGS_CONSOLE_BUFFERED_ROWS];
         }
 
         /// <summary>
@@ -179,7 +177,7 @@ namespace ObdExpress.Ui.Windows
         private void Window_Closed(object sender, EventArgs e)
         {
             StopMonitoringLoggingOutput();
-            this.Owner.Focus();
+            Owner.Focus();
         }
 
         /// <summary>

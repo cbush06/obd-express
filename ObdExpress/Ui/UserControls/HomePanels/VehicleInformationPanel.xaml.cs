@@ -109,34 +109,34 @@ namespace ObdExpress.Ui.UserControls.HomePanels
         public void ShowPanel(object sender, RoutedEventArgs e)
         {
             _isShown = true;
-            if (this.Show != null)
+            if (Show != null)
             {
-                this.Show(this, e);
+                Show(this, e);
             }
 
             // Start Monitoring
-            this.StartMonitoring(null);
+            StartMonitoring(null);
         }
 
         public void HidePanel(object sender, RoutedEventArgs e)
         {
             _isShown = false;
-            if (this.Hide != null)
+            if (Hide != null)
             {
-                this.Hide(this, e);
+                Hide(this, e);
             }
 
             // Stop Monitoring
-            this.StopMonitoring();
+            StopMonitoring();
         }
 
         public void StartMonitoring(SerialPort s)
         {
-            foreach (DataItem d in this._dataItems)
+            foreach (DataItem d in _dataItems)
             {
                 if (ELM327Connection.ELM327Device != null)
                 {
-                    ELM327Connection.ELM327Device.AsyncQuery(d.HandlerType.Name, this.Update);
+                    ELM327Connection.ELM327Device.AsyncQuery(d.HandlerType.Name, Update);
                 }
             }
         }
@@ -155,18 +155,18 @@ namespace ObdExpress.Ui.UserControls.HomePanels
 
         public void StopMonitoring()
         {
-            foreach (DataItem d in this._dataItems)
+            foreach (DataItem d in _dataItems)
             {
                 if (ELM327Connection.ELM327Device != null)
                 {
-                    ELM327Connection.ELM327Device.UnregisterListener(d.HandlerType.Name, this.Update);
+                    ELM327Connection.ELM327Device.UnregisterListener(d.HandlerType.Name, Update);
                 }
             }
         }
 
         public void Update(ELM327ListenerEventArgs e)
         {
-            foreach (DataItem d in this._dataItems)
+            foreach (DataItem d in _dataItems)
             {
                 if (d.HandlerType.Equals(e.Handler.GetType()))
                 {
@@ -181,13 +181,13 @@ namespace ObdExpress.Ui.UserControls.HomePanels
             {
                 case Variables.REGISTERED_EVENT_TYPE_HIDE_PANEL:
                     {
-                        this.Hide += ROUTED_EVENT_HANDLER;
+                        Hide += ROUTED_EVENT_HANDLER;
                         break;
                     }
 
                 case Variables.REGISTERED_EVENT_TYPE_SHOW_PANEL:
                     {
-                        this.Show += ROUTED_EVENT_HANDLER;
+                        Show += ROUTED_EVENT_HANDLER;
                         break;
                     }
             }
@@ -199,13 +199,13 @@ namespace ObdExpress.Ui.UserControls.HomePanels
             {
                 case Variables.REGISTERED_EVENT_TYPE_HIDE_PANEL:
                     {
-                        this.Hide -= ROUTED_EVENT_HANDLER;
+                        Hide -= ROUTED_EVENT_HANDLER;
                         break;
                     }
 
                 case Variables.REGISTERED_EVENT_TYPE_SHOW_PANEL:
                     {
-                        this.Show -= ROUTED_EVENT_HANDLER;
+                        Show -= ROUTED_EVENT_HANDLER;
                         break;
                     }
             }

@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ObdExpress.Ui.DataStructures
 {
@@ -31,9 +28,9 @@ namespace ObdExpress.Ui.DataStructures
         {
             get
             {
-                if (this._selectedTopMenu != null && this._selectedTopMenu.SelectedItem != null)
+                if (_selectedTopMenu != null && _selectedTopMenu.SelectedItem != null)
                 {
-                    return this._selectedTopMenu.SelectedItem;
+                    return _selectedTopMenu.SelectedItem;
                 }
                 return null;
             }
@@ -46,7 +43,7 @@ namespace ObdExpress.Ui.DataStructures
         {
             get
             {
-                return this._selectedTopMenu;
+                return _selectedTopMenu;
             }
         }
 
@@ -64,7 +61,7 @@ namespace ObdExpress.Ui.DataStructures
         public void AddTopMenu(TopMenu topMenu)
         {
             // Get an Enumerator for the collection of TopMenus
-            IEnumerator<TopMenu> topMenusEnum = this._topMenus.GetEnumerator();
+            IEnumerator<TopMenu> topMenusEnum = _topMenus.GetEnumerator();
 
             // Determine if the TopMenu already exists
             while (topMenusEnum.MoveNext())
@@ -77,25 +74,25 @@ namespace ObdExpress.Ui.DataStructures
             }
 
             // Add our TopMenu event handler to the TopMenuEvent for this new menu
-            topMenu.AddTopMenuEventListener(this.TopMenuEventHandler);
+            topMenu.AddTopMenuEventListener(TopMenuEventHandler);
 
             // If no matches are found, add the new TopMenu
-            this._topMenus.Add(topMenu);
+            _topMenus.Add(topMenu);
 
             // If this is the first TopMenu to be added, default it to selected
-            if (this._topMenus.Count == 1)
+            if (_topMenus.Count == 1)
             {
                 // Set the TopMenu to selected
                 topMenu.IsSelected = true;
 
                 // Store a reference to the selected TopMenu
-                this._selectedTopMenu = topMenu;
+                _selectedTopMenu = topMenu;
             }
 
             // Trigger a NavigationMenuEvent
-            if (this._navMenuEvent != null)
+            if (_navMenuEvent != null)
             {
-                this._navMenuEvent(this, NavigationMenuEventType.MENU_MODIFIED);
+                _navMenuEvent(this, NavigationMenuEventType.MENU_MODIFIED);
             }
         }
 
@@ -106,7 +103,7 @@ namespace ObdExpress.Ui.DataStructures
         public void RemoveTopMenu(string topMenuId)
         {
             // Get an Enumerator for the collections of TopMenus
-            IEnumerator<TopMenu> topMenuItems = this._topMenus.GetEnumerator();
+            IEnumerator<TopMenu> topMenuItems = _topMenus.GetEnumerator();
 
             // Store a reference to the item to be removed
             TopMenu toRemove = null;
@@ -130,12 +127,12 @@ namespace ObdExpress.Ui.DataStructures
             else
             {
                 // A match was found, so remove it
-                this._topMenus.Remove(toRemove);
+                _topMenus.Remove(toRemove);
 
                 // Trigger a NavigationMenuEvent
-                if (this._navMenuEvent != null)
+                if (_navMenuEvent != null)
                 {
-                    this._navMenuEvent(this, NavigationMenuEventType.MENU_MODIFIED);
+                    _navMenuEvent(this, NavigationMenuEventType.MENU_MODIFIED);
                 }
             }
         }
@@ -148,7 +145,7 @@ namespace ObdExpress.Ui.DataStructures
         {
             if (navMenuEventListener != null)
             {
-                this._navMenuEvent += navMenuEventListener;
+                _navMenuEvent += navMenuEventListener;
             }
         }
 
@@ -160,7 +157,7 @@ namespace ObdExpress.Ui.DataStructures
         {
             if (navMenuEventListener != null)
             {
-                this._navMenuEvent -= navMenuEventListener;
+                _navMenuEvent -= navMenuEventListener;
             }
         }
 
@@ -170,7 +167,7 @@ namespace ObdExpress.Ui.DataStructures
         /// <returns>An IEnumerator for the collection of TopMenus.</returns>
         public IEnumerator<TopMenu> GetEnumerator()
         {
-            return this._topMenus.GetEnumerator();
+            return _topMenus.GetEnumerator();
         }
 
         /// <summary>
@@ -186,10 +183,10 @@ namespace ObdExpress.Ui.DataStructures
                 // A TopMenu has been modified (buttons added or removed)
                 case TopMenuEventType.MENU_MODIFIED:
                     {
-                        if (this._navMenuEvent != null)
+                        if (_navMenuEvent != null)
                         {
                             // Bubble this event upwards
-                            this._navMenuEvent(this, NavigationMenuEventType.MENU_MODIFIED);
+                            _navMenuEvent(this, NavigationMenuEventType.MENU_MODIFIED);
                         }
 
                         break;
@@ -198,9 +195,9 @@ namespace ObdExpress.Ui.DataStructures
                 // One of the MenuItems in this TopMenu were selected
                 case TopMenuEventType.MENUITEM_SELECTED:
                     {
-                        if (this._navMenuEvent != null)
+                        if (_navMenuEvent != null)
                         {
-                            this._navMenuEvent(this, NavigationMenuEventType.MENUITEM_SELECTED);
+                            _navMenuEvent(this, NavigationMenuEventType.MENUITEM_SELECTED);
                         }
 
                         break;
@@ -210,18 +207,18 @@ namespace ObdExpress.Ui.DataStructures
                 case TopMenuEventType.TOPMENU_SELECTED:
                     {
                         // De-select the old TopMenu
-                        this._selectedTopMenu.IsSelected = false;
+                        _selectedTopMenu.IsSelected = false;
 
                         // Set the new TopMenu
-                        this._selectedTopMenu = topMenu;
+                        _selectedTopMenu = topMenu;
 
                         // Set the newly selected TopMenu to selected
-                        this._selectedTopMenu.IsSelected = true;
+                        _selectedTopMenu.IsSelected = true;
 
                         // Bubble the event up
-                        if (this._navMenuEvent != null)
+                        if (_navMenuEvent != null)
                         {
-                            this._navMenuEvent(this, NavigationMenuEventType.TOPMENU_SELECTED);
+                            _navMenuEvent(this, NavigationMenuEventType.TOPMENU_SELECTED);
                         }
 
                         break;

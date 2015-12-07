@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
+﻿using System.ComponentModel;
 using System.Windows.Input;
 
 namespace ObdExpress.Ui.DataStructures
@@ -33,7 +27,7 @@ namespace ObdExpress.Ui.DataStructures
         {
             get
             {
-                return this._menuItemId;
+                return _menuItemId;
             }
         }
 
@@ -44,7 +38,7 @@ namespace ObdExpress.Ui.DataStructures
         {
             get
             {
-                return this._menuItemLabel;
+                return _menuItemLabel;
             }
         }
 
@@ -55,7 +49,7 @@ namespace ObdExpress.Ui.DataStructures
         {
             get
             {
-                return this._menuItemIconPath;
+                return _menuItemIconPath;
             }
         }
 
@@ -66,14 +60,14 @@ namespace ObdExpress.Ui.DataStructures
         {
             get
             {
-                return this._isSelected;
+                return _isSelected;
             }
             set
             {
-                this._isSelected = value;
+                _isSelected = value;
 
                 // Update any items monitoring this model
-                this.NotifyPropertyChanged("IsSelected");
+                NotifyPropertyChanged("IsSelected");
             }
         }
 
@@ -84,7 +78,7 @@ namespace ObdExpress.Ui.DataStructures
         {
             get
             {
-                return this.MenuItem_OnClick;
+                return MenuItem_OnClick;
             }
         }
 
@@ -96,9 +90,9 @@ namespace ObdExpress.Ui.DataStructures
         /// <param name="iconPath">Path to the icon to be shown on this MenuItem's corresponding button. If an empty string is provided, no icon will be shown.</param>
         public MenuItem(string id, string label, string iconPath)
         {
-            this._menuItemId = id;
-            this._menuItemLabel = label;
-            this._menuItemIconPath = iconPath;
+            _menuItemId = id;
+            _menuItemLabel = label;
+            _menuItemIconPath = iconPath;
         }
 
         /// <summary>
@@ -112,7 +106,7 @@ namespace ObdExpress.Ui.DataStructures
         {
             if (menuItemEventListener != null)
             {
-                this._menuItemEvent += menuItemEventListener;
+                _menuItemEvent += menuItemEventListener;
             }
         }
 
@@ -123,7 +117,7 @@ namespace ObdExpress.Ui.DataStructures
         /// <param name="menuItemEventListener">The method listening to this MenuItem's MenuItemEvent.</param>
         public void AddMenuItemEventListener(MenuItemEvent menuItemEventListener)
         {
-            this._menuItemEvent += menuItemEventListener;
+            _menuItemEvent += menuItemEventListener;
         }
 
         /// <summary>
@@ -132,7 +126,7 @@ namespace ObdExpress.Ui.DataStructures
         /// <param name="menuItemEventListener">The method to remove from this MenuItem's MenuItemEvent.</param>
         public void RemoveMenuItemEventListener(MenuItemEvent menuItemEventListener)
         {
-            this._menuItemEvent -= menuItemEventListener;
+            _menuItemEvent -= menuItemEventListener;
         }
 
         /// <summary>
@@ -144,11 +138,11 @@ namespace ObdExpress.Ui.DataStructures
         {
             // We only want to evoke an action for this MenuItem.
             // Whether it is selected, or not, should be handled at a higher level.
-            if (!(this.IsSelected))
+            if (!(IsSelected))
             {
-                if (this._menuItemEvent != null)
+                if (_menuItemEvent != null)
                 {
-                    this._menuItemEvent(this);
+                    _menuItemEvent(this);
                 }
             }
         }
@@ -158,9 +152,9 @@ namespace ObdExpress.Ui.DataStructures
         public event PropertyChangedEventHandler PropertyChanged;
         public void NotifyPropertyChanged(string propertyName)
         {
-            if (this.PropertyChanged != null)
+            if (PropertyChanged != null)
             {
-                this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
             }
         }
 

@@ -8,3 +8,13 @@ C:\Users\Clint Bush\documents\visual studio 2012\Projects\OBDExpress\MiscHandler
 C:\Users\Clint Bush\documents\visual studio 2012\Projects\OBDExpress\MiscHandlers\obj\Debug\MiscHandlers.csprojResolveAssemblyReference.cache
 C:\Users\Clint Bush\documents\visual studio 2012\Projects\OBDExpress\MiscHandlers\obj\Debug\MiscHandlers.dll
 C:\Users\Clint Bush\documents\visual studio 2012\Projects\OBDExpress\MiscHandlers\obj\Debug\MiscHandlers.pdb
+C:\Users\Clint Bush\Documents\Visual Studio 2015\Projects\obd-express\MiscHandlers\bin\Debug\MiscHandlers.dll
+C:\Users\Clint Bush\Documents\Visual Studio 2015\Projects\obd-express\MiscHandlers\bin\Debug\MiscHandlers.pdb
+C:\Users\Clint Bush\Documents\Visual Studio 2015\Projects\obd-express\MiscHandlers\bin\Debug\Elm327API.dll
+C:\Users\Clint Bush\Documents\Visual Studio 2015\Projects\obd-express\MiscHandlers\bin\Debug\log4net.dll
+C:\Users\Clint Bush\Documents\Visual Studio 2015\Projects\obd-express\MiscHandlers\bin\Debug\Elm327API.pdb
+C:\Users\Clint Bush\Documents\Visual Studio 2015\Projects\obd-express\MiscHandlers\bin\Debug\log4net.pdb
+C:\Users\Clint Bush\Documents\Visual Studio 2015\Projects\obd-express\MiscHandlers\bin\Debug\log4net.xml
+C:\Users\Clint Bush\Documents\Visual Studio 2015\Projects\obd-express\MiscHandlers\obj\Debug\MiscHandlers.csprojResolveAssemblyReference.cache
+C:\Users\Clint Bush\Documents\Visual Studio 2015\Projects\obd-express\MiscHandlers\obj\Debug\MiscHandlers.dll
+C:\Users\Clint Bush\Documents\Visual Studio 2015\Projects\obd-express\MiscHandlers\obj\Debug\MiscHandlers.pdb

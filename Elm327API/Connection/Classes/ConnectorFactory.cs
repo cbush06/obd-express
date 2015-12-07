@@ -24,7 +24,7 @@ namespace ELM327API.Connection.Classes
         {
             get
             {
-                return this._metaConnectors;
+                return _metaConnectors;
             }
         }
 
@@ -37,12 +37,12 @@ namespace ELM327API.Connection.Classes
             string[] portNames = SerialPort.GetPortNames();
 
             // Add an entry for the AutoConnector
-            this._metaConnectors.AddLast(new MetaConnector("", "Auto Connector"));
+            _metaConnectors.AddLast(new MetaConnector("", "Auto Connector"));
 
             // Add a connector for each Port Name to the list
             foreach (string port in portNames)
             {
-                this._metaConnectors.AddLast(new MetaConnector(port, port));
+                _metaConnectors.AddLast(new MetaConnector(port, port));
             }
         }
 

@@ -1,18 +1,11 @@
-﻿using ELM327API;
-using ELM327API.Global;
+﻿using ELM327API.Global;
 using ELM327API.Processing.DataStructures;
+using ELM327API.Processing.Handlers;
 using ELM327API.Processing.Interfaces;
 using System;
-using System.Collections;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO.Ports;
-using System.Linq;
-using System.Runtime.InteropServices;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace ELM327API.Processing.Protocols
 {
@@ -62,14 +55,6 @@ namespace ELM327API.Processing.Protocols
         private readonly ushort BITMASK_SID         = 0x00BF; // Service Identifier
         private readonly ushort BITMASK_PID         = 0x00FF; // Parameter Identifier
 
-        /*
-         * Standard error messages for ELM327.
-         */
-        private string noDataMessage = "NO DATA";
-        private string searchingMessage = "SEARCHING...";
-        private string unableConnectMessage = "UNABLE TO CONNECT";
-        private string stoppedMessage = "STOPPED";
-
         /// <summary>
         /// Enum designating the different types of frames.
         /// </summary>
@@ -84,6 +69,35 @@ namespace ELM327API.Processing.Protocols
         // Store the most recently used custom header. If we keep track of which header was used last, and sequential frames use the same custom header,
         // we will not need to set/reset the header every transmission. This saves TIME!
         private StringBuilder _lastUsedHeader = new StringBuilder(30, 50);
+        
+        /// <summary>
+        /// List of most common ECUs.
+        /// </summary>
+        public override List<ECU> EcuAddresses {
+            get { return _EcuAddresses;  }
+        }
+        private List<ECU> _EcuAddresses = new List<ECU>()
+        {
+            new ECU("Broadcast", 0, 0x7DF, 0x000),
+            new ECU("Engine Control Module", 1, 0x7E0, 0x7E8),
+            new ECU("Transmission Control Module", 2, 0x7E1, 0x7E9),
+            new ECU("ECU #3", 3, 0x7E2, 0x7EA),
+            new ECU("ECU #4", 4, 0x7E3, 0x7EB),
+            new ECU("ECU #5", 5, 0x7E4, 0x7EC),
+            new ECU("ECU #6", 6, 0x7E5, 0x7ED),
+            new ECU("ECU #7", 7, 0x7E6, 0x7EE),
+            new ECU("ECU #8", 8, 0x7E7, 0x7EF)
+        };
+
+        /// <summary>
+        /// ECU selected for addressing requests and filtering responses.
+        /// </summary>
+        private ECU _selectedEcuFilter = Global.Constants.NoSelection;
+        public override ECU SelectedEcuFilter
+        {
+            get { return _selectedEcuFilter; }
+            set { _selectedEcuFilter = value; }
+        }
 
         /// <summary>
         /// Executes one request/response cycle on the port set as this Protocol's connection.
@@ -95,8 +109,6 @@ namespace ELM327API.Processing.Protocols
             // Variables
             uint idBuffer = 0x00000000;
             uint pciBuffer = 0x00000000;
-            uint i = 0;
-            Response curResponse;
             bool returnValue = true;
             string tempString;
 
@@ -112,101 +124,85 @@ namespace ELM327API.Processing.Protocols
              */
 
             // Reset our stopwatch
-            this.CurrentRunningTime = 0;
-            this.stopwatch.Reset();
+            CurrentRunningTime = 0;
+            stopwatch.Reset();
 
             // Reset stop execution flag
-            this.StopExecution = false;
-
-            // If this handler requires custom headers, let's take care of that
-            if (handler.IsCustomHeader)
+            StopExecution = false;
+            
+            // If no ECU filter is set and this handler requires custom headers, let's take care of that
+            if (SelectedEcuFilter == Global.Constants.NoSelection && handler.IsCustomHeader)
             {
                 // Only set the custom header if it is not already set
-                if (!(this._lastUsedHeader.Equals(handler.Header)))
+                if (!(_lastUsedHeader.Equals(handler.Header)))
                 {
-                    // Request the Semaphore
-                    this.ConnectionSemaphore.WaitOne();
-
-                    // Set header
-                    this._incomingResponseBuffer.Append(this.ExecuteATCommand(@"SH" + handler.Header));
-                    if (!(this._incomingResponseBuffer.ToString().Equals("OK")))
-                    {
-                        log.Error("Attempt at Set Headers [AT SH " + handler.Header + "] failed. Response: " + this._incomingResponseBuffer.ToString());
-                        return false;
-                    }
-                    this._incomingResponseBuffer.Clear();
-
-                    // Release the Semaphore
-                    this.ConnectionSemaphore.Release();
-
-                    this._lastUsedHeader.Clear();
-                    this._lastUsedHeader.Append(handler.Header);
+                    if (!SetRequestHeader(handler.Header)) return false;
+                    _lastUsedHeader.Clear().Append(handler.Header);
                 }
             }
-            // If this handler does not require custom headers, but the last handler did,
-            // we MUST clear the custom headers out of the ELM 327 device.
+            // If no custom handler is required or an ECU filter is selected...
             else
             {
-                // If _lastUsedHeader 
-                if (!(this._lastUsedHeader.ToString().Equals("")))
+                // If an ECU filter is selected, apply it if necessary
+                if(SelectedEcuFilter != Global.Constants.NoSelection)
                 {
-                    // Request the Semaphore
-                    this.ConnectionSemaphore.WaitOne();
-
-                    // Restore ELM 327 to defaults
-                    this._incomingResponseBuffer.Append(this.ExecuteATCommand(@"D"));
-                    if (!(this._incomingResponseBuffer.ToString().Equals("OK")))
+                    // Skip this if we're debugging (the emulator doesn't handle the AT SH command)
+                    #if !DEBUG
+                    if(!(_lastUsedHeader.ToString().Equals(SelectedEcuFilter.RequestAddressString)))
                     {
-                        log.Error("Attempt at Set to Defaults [AT D] failed. Response: " + this._incomingResponseBuffer.ToString());
-                        return false;
+                        if (!SetRequestHeader(SelectedEcuFilter.RequestAddressString)) return false;
+                        _lastUsedHeader.Clear().Append(SelectedEcuFilter.RequestAddressString);
                     }
-                    this._incomingResponseBuffer.Clear();
-
-                    // Release the Semaphore
-                    this.ConnectionSemaphore.Release();
-
-                    this._lastUsedHeader.Clear();
+                    #endif
+                }
+                // If no ECU filter is applied and this handler does not require custom headers, 
+                // but the last handler did, we MUST clear the custom headers out of the ELM 327 device.
+                else if (!(_lastUsedHeader.ToString().Equals("")))
+                {
+                    if (!SetRequestHeader(EcuAddresses[0].RequestAddressString)) return false;
+                    _lastUsedHeader.Clear();
+                    _incomingResponseBuffer.Clear();
                 }
             }
 
             // Transmit the request
-            this.ConnectionSemaphore.WaitOne();
-            this.Connection.DiscardInBuffer();
-            this.Connection.DiscardOutBuffer();
-            this.ExecuteCommand(handler.Request);
+            ConnectionSemaphore.WaitOne();
+            Connection.DiscardInBuffer();
+            Connection.DiscardOutBuffer();
+            ExecuteCommand(handler.Request);
 
             // Do we expect a response?
             if (handler.ExpectsResponse)
             {
                 // Begin listening
-                this._hasMoreResponses = true;
+                _hasMoreResponses = true;
 
                 try
                 {
-                    this.stopwatch.Start();
-                    while (this._hasMoreResponses && !(this.StopExecution))
+                    stopwatch.Start();
+                    while (_hasMoreResponses && !(StopExecution))
                     {
                         // Clear the buffer
-                        this._incomingResponseBuffer.Clear();
+                        _incomingResponseBuffer.Clear();
 
                         // Grab the incoming message
-                        this._incomingResponseBuffer.Append(this.Connection.ReadLine());
+                        _incomingResponseBuffer.Append(Connection.ReadLine());
 
                         // Verify a line was received
-                        if (this._incomingResponseBuffer.Length < 1)
+                        if (_incomingResponseBuffer.Length < 1)
                         {
                             continue;
                         }
 
                         // Remove the prompt if it exists
-                        if (this._incomingResponseBuffer[0] == '>')
+                        if (_incomingResponseBuffer[0] == '>')
                         {
-                            this._incomingResponseBuffer.Remove(0, 1);
+                            _incomingResponseBuffer.Remove(0, 1);
                         }
 
                         // Ensure an error was not received
-                        tempString = this._incomingResponseBuffer.ToString();
-                        if (tempString.Equals(stoppedMessage) || tempString.Equals(noDataMessage) || tempString.Equals(searchingMessage) || tempString.Equals(unableConnectMessage))
+                        tempString = _incomingResponseBuffer.ToString();
+                        if (tempString.Equals(Global.Constants.STOPPED_MESSAGE) || tempString.Equals(Global.Constants.NO_DATA_MESSAGE) || tempString.Equals(Global.Constants.SEARCHING_MESSAGE) || tempString.Equals(Global.Constants.UNABLE_TO_CONNECT_MESSAGE))
                         {
                             continue;
                         }
@@ -216,11 +212,19 @@ namespace ELM327API.Processing.Protocols
                         
                         fixed (byte* p1 = parsingBuffer)
                         {
-                            // Get the CAN ID
-                            idBuffer = (uint)(((parsingBuffer[0] << 8) | parsingBuffer[1]) & BITMASK_ID) >> 5;
+                            // Get the CAN ID (we grab 12 bits to compare the 3 hex characters -- note, the last bit is always 0)
+                            idBuffer = (uint)(((parsingBuffer[0] << 8) | parsingBuffer[1]) & BITMASK_ID) >> 4;
 
                             // Get the PCI Code
                             pciBuffer = (uint)parsingBuffer[1] & BITMASK_PCITYPE;
+
+                            // If an ECU filter is set, confirm the idBuffer equals the ECU's Return Address
+                            if(SelectedEcuFilter != Global.Constants.NoSelection && idBuffer != SelectedEcuFilter.ReturnAddress)
+                            {
+                                log.Error("Filtering for [" + SelectedEcuFilter.ReturnAddressString + "]. Message from [" + idBuffer.ToString("X6") + "] rejected.");
+                                returnValue = false;
+                                break;
+                            }
 
                             switch (pciBuffer)
                             {
@@ -233,8 +237,8 @@ namespace ELM327API.Processing.Protocols
                                             ProcessSingleFrameResponse(handler, parsingBuffer)
                                         );
 
-                                        // Exit gracefully
-                                        this._hasMoreResponses = false;
+                                            // Exit gracefully
+                                            _hasMoreResponses = false;
                                     }
                                     catch (ProtocolProcessingException e)
                                     {
@@ -256,8 +260,8 @@ namespace ELM327API.Processing.Protocols
                                     {
                                         log.Error("First Frame Processing Exception Occurred for [" + handler.Name + ":" + handler.Request + "]:", e);
 
-                                        // Cancel this Request/Response Cycle
-                                        this._responseBuffer.Remove(idBuffer);
+                                            // Cancel this Request/Response Cycle
+                                            _responseBuffer.Remove(idBuffer);
                                         returnValue = false;
                                     }
                                     break;
@@ -276,16 +280,16 @@ namespace ELM327API.Processing.Protocols
                                             // Send the data to the handler
                                             handler.ProcessResponse(multiframeDataBuffer);
 
-                                            // Remove this response from the response buffer
-                                            this._responseBuffer.Remove(idBuffer);
+                                                // Remove this response from the response buffer
+                                                _responseBuffer.Remove(idBuffer);
                                         }
                                     }
                                     catch (Exception e)
                                     {
                                         log.Error("Consecutive Frame Processing Exception Occurred for [" + handler.Name + ":" + handler.Request + "]:", e);
 
-                                        // Cancel this Request/Response Cycle
-                                        this._responseBuffer.Remove(idBuffer);
+                                            // Cancel this Request/Response Cycle
+                                            _responseBuffer.Remove(idBuffer);
                                         returnValue = false;
                                     }
 
@@ -295,36 +299,88 @@ namespace ELM327API.Processing.Protocols
                         }
 
                         // Update the running time
-                        this.CurrentRunningTime = stopwatch.ElapsedMilliseconds;
+                        CurrentRunningTime = stopwatch.ElapsedMilliseconds;
 
                         // Check if we need to continue listening
-                        if (this._responseBuffer.Count == 0)
+                        if (_responseBuffer.Count == 0)
                         {
-                            this._hasMoreResponses = false;
+                            _hasMoreResponses = false;
                         }
 
                         // Clear the buffer to try again
-                        this._incomingResponseBuffer.Clear();
+                        _incomingResponseBuffer.Clear();
                     }
                 }
                 catch (Exception e)
                 {
-                    log.Error("Exception occurred while reading responses for [" + handler.Name + ":" + handler.Request + "]:", e);
+                    log.Error("Exception occurred while reading responses for [" + handler.Name + ":" + handler.Request + "]: " + e.Message);
                     returnValue = false;
                 }
-                
-                // Stop the stopwatch, clear the current running time, and broadcast the response time
-                this.stopwatch.Stop();
-                this.CurrentRunningTime = 0;
 
-                if (this.BroadcastResponseTime != null)
+                // Stop the stopwatch, clear the current running time, and broadcast the response time
+                stopwatch.Stop();
+                CurrentRunningTime = 0;
+
+                if (BroadcastResponseTime != null)
                 {
-                    this.BroadcastResponseTime(this.stopwatch.ElapsedMilliseconds);
+                    BroadcastResponseTime(stopwatch.ElapsedMilliseconds);
                 }
             }
 
             // Release the Semaphore
-            this.ConnectionSemaphore.Release();
+            ConnectionSemaphore.Release();
+
+            return returnValue;
+        }
+
+        /// <summary>
+        /// This method cycles through the list of ECU Addresses (see <see cref="IProtocol.EcuAddresses"/>) and
+        /// queries each one to see if it exists. A list of responsive ECUs is returned.
+        /// </summary>
+        /// <returns>List of ECUs that responded to queries.</returns>
+        public override List<ECU> AutoDetectEcus()
+        {
+            // Variables
+            List<ECU> returnValue = new List<ECU>();
+            ELM327ListenerEventArgs response = null;
+            Stopwatch stopWatch = new Stopwatch();
+
+            // Find a Handler with the provided name
+            DiagnosticSessionControlHandler interrogationHandler = new DiagnosticSessionControlHandler();
+
+            // Add an anonymous listener that gets the value for us
+            interrogationHandler.RegisterSingleListener(
+                new Action<ELM327ListenerEventArgs>(
+                    (ELM327ListenerEventArgs args) =>
+                    {
+                        response = args;
+                    }
+                )
+            );
+
+            // Wait no more than 100 milliseconds for a response
+            foreach (ECU nextEcu in EcuAddresses)
+            {
+                // Set the ECU request address
+                interrogationHandler.Header = nextEcu.RequestAddress.ToString("X6");
+
+                // Interrogate
+                bool successfulExecution = Execute(interrogationHandler);
+
+                // If a valid response was received, add the ECU
+                if (successfulExecution && response != null && !response.IsBadResponse)
+                {
+                    returnValue.Add(nextEcu);
+                }
+
+                response = null;
+            }
+
+#if DEBUG
+            // If we are debugging, add the Engine Control Module as a "responsive" ECU
+            // because the emulator doesn't recognize UDS commands (see ISO15765-3).
+            returnValue.Add(EcuAddresses[1]);
+#endif
 
             return returnValue;
         }
@@ -352,9 +408,7 @@ namespace ELM327API.Processing.Protocols
                 // Verify Data Length
                 if (dlBuffer == 0 || dlBuffer > 7)
                 {
-                    log.Error("Received CAN Single Frame with invalid Data Length [" + dlBuffer.ToString() + "].");
-                    this._hasMoreResponses = false;
-                    
+                    _hasMoreResponses = false;
                     throw new ProtocolProcessingException("Received CAN Single Frame with invalid Data Length [" + dlBuffer.ToString() + "].");
                 }
 
@@ -367,13 +421,11 @@ namespace ELM327API.Processing.Protocols
 
                     if (!(handler.OBDSID == sidBuffer))
                     {
-                        log.Error("Response to OBD request [" + handler.Request + "] has invalid SID [" + sidBuffer + "]. It should be [" + handler.OBDSID + "].");
                         throw new ProtocolProcessingException("Response to OBD request [" + handler.Request + "] has invalid SID [" + sidBuffer + "]. It should be [" + handler.OBDSID + "].");
                     }
 
                     if (!(handler.OBDPID == pidBuffer))
                     {
-                        log.Error("Response to OBD request [" + handler.Request + "] has invalid PID [" + pidBuffer + "]. It should be [" + handler.OBDPID + "].");
                         throw new ProtocolProcessingException("Response to OBD request [" + handler.Request + "] has invalid PID [" + pidBuffer + "]. It should be [" + handler.OBDPID + "].");
                     }
 
@@ -395,7 +447,6 @@ namespace ELM327API.Processing.Protocols
             }
             catch (Exception e)
             {
-                log.Error("Exception occurred while reading single frame response to command [" + handler.Request + "].", e);
                 throw new ProtocolProcessingException("Exception occurred while reading single frame response to command [" + handler.Request + "].", e);
             }
 
@@ -425,7 +476,6 @@ namespace ELM327API.Processing.Protocols
                 // Validate data length
                 if (dlBuffer < 8)
                 {
-                    log.Error("Invalid data length received for first frame. Data Length = " + dlBuffer.ToString());
                     throw new ProtocolProcessingException("Invalid data length received for first frame. Data Length = " + dlBuffer.ToString());
                 }
 
@@ -438,13 +488,11 @@ namespace ELM327API.Processing.Protocols
 
                     if (!(handler.OBDSID == sidBuffer))
                     {
-                        log.Error("Response to OBD request [" + handler.Request + "] has invalid SID [" + sidBuffer + "]. It should be [" + handler.OBDSID + "].");
                         throw new ProtocolProcessingException("Response to OBD request [" + handler.Request + "] has invalid SID [" + sidBuffer + "]. It should be [" + handler.OBDSID + "].");
                     }
 
                     if (!(handler.OBDPID == pidBuffer))
                     {
-                        log.Error("Response to OBD request [" + handler.Request + "] has invalid PID [" + sidBuffer + "]. It should be [" + handler.OBDPID + "].");
                         throw new ProtocolProcessingException("Response to OBD request [" + handler.Request + "] has invalid PID [" + sidBuffer + "]. It should be [" + handler.OBDPID + "].");
                     }
 
@@ -472,15 +520,14 @@ namespace ELM327API.Processing.Protocols
                 response.ReceivedLength = 4;
 
                 // Store the response for appending its consecutive frames when they arrive
-                if(this._responseBuffer.ContainsKey(canId))
+                if(_responseBuffer.ContainsKey(canId))
                 {
-                    this._responseBuffer.Remove(canId);
+                    _responseBuffer.Remove(canId);
                 }
-                this._responseBuffer.Add(canId, response);
+                _responseBuffer.Add(canId, response);
             }
             catch (Exception e)
             {
-                log.Error("Exception occurred while reading first frame response to command [" + handler.Request + "].", e);
                 throw new ProtocolProcessingException("Exception occurred while reading first frame response to command [" + handler.Request + "].", e);
             }
         }
@@ -503,12 +550,11 @@ namespace ELM327API.Processing.Protocols
             try
             {
                 // Retrieve the response this frame is for
-                if (!(this._responseBuffer.ContainsKey(canId)))
+                if (!(_responseBuffer.ContainsKey(canId)))
                 {
-                    log.Error("Unidentified consecutive frame received.");
                     throw new ProtocolProcessingException("Unidentified consecutive frame received.");
                 }
-                response = this._responseBuffer[canId];
+                response = _responseBuffer[canId];
 
                 // Get the sequence number
                 snBuffer = (uint)packetBuffer[2] >> 4;
@@ -516,7 +562,6 @@ namespace ELM327API.Processing.Protocols
                 // Validate sequence number
                 if ((response.ReceivedFrames % 15) != snBuffer)
                 {
-                    log.Error("Invalid sequence number received for frame. Frames Received = " + response.ReceivedFrames.ToString() + "; Sequence Number = " + snBuffer.ToString());
                     throw new ProtocolProcessingException("Invalid sequence number received for frame. Frames Received = " + response.ReceivedFrames.ToString() + "; Sequence Number = " + snBuffer.ToString());
                 }
 
@@ -545,7 +590,6 @@ namespace ELM327API.Processing.Protocols
             }
             catch (Exception e)
             {
-                log.Error("Exception occurred while reading consecutive frame response to command [" + handler.Request + "].", e);
                 throw new ProtocolProcessingException("Exception occurred while reading consecutive frame response to command [" + handler.Request + "].", e);
             }
 

@@ -1,11 +1,11 @@
-﻿using log4net;
+﻿using ELM327API.Global;
+using ELM327API.Processing.DataStructures;
+using log4net;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO.Ports;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace ELM327API.Processing.Interfaces
 {
@@ -46,11 +46,33 @@ namespace ELM327API.Processing.Interfaces
         public abstract event NoReturnWithLongParam BroadcastResponseTime;
 
         /// <summary>
+        /// List of primary ECUs. There is no set minimum or maximum number of these, but
+        /// it should include the most common ECUs for the individual protocol being defined.
+        /// 
+        /// NOTE: The first entry (index 0) should always be the functional/broadcast request address. This 
+        ///       entry does not need to provide a response address, only a request address.
+        /// </summary>
+        public abstract List<ECU> EcuAddresses { get; }
+
+        /// <summary>
+        /// This is the ECU selected by the user for the ELM327 to correspond with. This should always
+        /// default to <see cref="ELM327API.Global.Constants.NoSelection"/>.
+        /// </summary>
+        public abstract ECU SelectedEcuFilter { get; set; }
+
+        /// <summary>
         /// Executes a request/response cycle for the specified Handler.
         /// </summary>
         /// <param name="handler">The Handler for whom this Protocol processor will be executing a request/response cycle.</param>
         /// <returns>True if the execution was successful; otherwise, false.</returns>
         public abstract bool Execute(IHandler handler);
+
+        /// <summary>
+        /// This method cycles through the list of ECU Addresses (see <see cref="IProtocol.EcuAddresses"/>) and
+        /// queries each one to see if it exists. A list of responsive ECUs is returned.
+        /// </summary>
+        /// <returns>List of ECUs that responded to queries.</returns>
+        public abstract List<ECU> AutoDetectEcus();
 
         /// <summary>
         /// Allows the ELM327 class to set the SerialPort and Semaphore this Protocol will use to communicate.
@@ -59,8 +81,37 @@ namespace ELM327API.Processing.Interfaces
         /// <param name="connectionSemaphore">Semaphore to be used for controlling access to the SerialPort.</param>
         public void SetConnectionProperties(SerialPort connection, Semaphore connectionSemaphore)
         {
-            this.Connection = connection;
-            this.ConnectionSemaphore = connectionSemaphore;
+            Connection = connection;
+            ConnectionSemaphore = connectionSemaphore;
+        }
+
+        /// <summary>
+        /// Changes the request header set on the ELM327.
+        /// </summary>
+        /// <param name="header">Request header to set.</param>
+        /// <returns>True if successful; otherwise, false.</returns>
+        protected bool SetRequestHeader(string header)
+        {
+            string response = String.Empty;
+
+            // Request the Semaphore
+            ConnectionSemaphore.WaitOne();
+
+            // Set header
+            response = ExecuteATCommand(@"SH" + header);
+
+            // If we were not successful at setting the header, quit.
+            if (!(response.Equals("OK")))
+            {
+                log.Error("Attempt at Set Headers [AT SH " + header + "] failed. Response: " + response.ToString());
+                ConnectionSemaphore.Release();
+                return false;
+            }
+
+            // Release the Semaphore
+            ConnectionSemaphore.Release();
+
+            return true;
         }
 
         /// <summary>
@@ -70,22 +121,33 @@ namespace ELM327API.Processing.Interfaces
         /// <returns>Response from the ELM327 device.</returns>
         protected string ExecuteATCommand(string command)
         {
-            string returnValue;
+            Stopwatch stopWatch = new Stopwatch();
+            string returnValue = String.Empty;
+            int iterator = 0;
 
             try
             {
-                // Clear the In/Out buffer
-                this.Connection.DiscardInBuffer();
-                this.Connection.DiscardOutBuffer();
+                while((returnValue.Equals(String.Empty) || returnValue.Equals(Constants.STOPPED_MESSAGE) || returnValue.Equals("?")) && iterator < Constants.AT_COMMAND_RETRIES) {
+                    // Keep count. Try no more than numberOfTries times...
+                    iterator++;
 
-                // Write out our command
-                this.Connection.WriteLine(@"AT" + command);
+                    // Clear the In/Out buffer
+                    Connection.DiscardInBuffer();
+                    Connection.DiscardOutBuffer();
 
-                // Read the response
-                returnValue = this.Connection.ReadLine();
+                    // Write out our command
+                    IProtocol.log.Info(@"Attempt [" + iterator.ToString() + "] Sending Command: AT" + command);
+                    Connection.WriteLine(@"AT" + command);
+
+                    // Read the response
+                    returnValue = Connection.ReadLine();
+
+                    // Log results
+                    IProtocol.log.Info(@"Attempt [" + iterator.ToString() + "] Receiving Response: " + returnValue);
+                }
 
                 // Check for the > character
-                if (returnValue[0] == '>')
+                if (returnValue.Length > 0 && returnValue[0] == '>')
                 {
                     return returnValue.Substring(1);
                 }
@@ -95,7 +157,7 @@ namespace ELM327API.Processing.Interfaces
             catch (Exception e)
             {
                 log.Error("Exception thrown while executing an AT command: AT " + command, e);
-                return null;
+                return String.Empty;
             }
         }
 
@@ -108,11 +170,11 @@ namespace ELM327API.Processing.Interfaces
             try
             {
                 // Clear the In/Out buffer
-                this.Connection.DiscardInBuffer();
-                this.Connection.DiscardOutBuffer();
+                Connection.DiscardInBuffer();
+                Connection.DiscardOutBuffer();
 
                 // Write out our command
-                this.Connection.WriteLine(command);
+                Connection.WriteLine(command);
             }
             catch (Exception e)
             {

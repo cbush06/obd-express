@@ -40,7 +40,7 @@ namespace ELM327API.Connection.Classes
             bool success = false;
 
             // Reset KeepAlive
-            this.KeepAlive = true;
+            KeepAlive = true;
 
             // Enumerate the ports
             string[] portNames = SerialPort.GetPortNames();
@@ -59,7 +59,7 @@ namespace ELM327API.Connection.Classes
                     _currentPort = new SerialPort(portName);
 
                     // Tell the user what we're testing
-                    this.CheckingPort(portName);
+                    CheckingPort(portName);
 
                     // Prepare the port
                     _currentPort.BaudRate = _connectionSettings.BaudRate;
@@ -67,8 +67,8 @@ namespace ELM327API.Connection.Classes
                     _currentPort.Parity = _connectionSettings.Parity;
                     _currentPort.StopBits = _connectionSettings.StopBits;
                     _currentPort.NewLine = "\r";
-                    _currentPort.ReadTimeout = 50;
-                    _currentPort.WriteTimeout = 50;
+                    _currentPort.ReadTimeout = _connectionSettings.ReadTimeout;
+                    _currentPort.WriteTimeout = _connectionSettings.WriteTimout;
 
                     // Log the configuration
                     AutoConnector.log.Info("Checking port " + portName + " with parameters"
@@ -76,6 +76,8 @@ namespace ELM327API.Connection.Classes
                                             + ", DataBits = " + _currentPort.DataBits.ToString()
                                             + ", Parity = " + _currentPort.Parity.ToString()
                                             + ", StopBits = " + _currentPort.StopBits.ToString()
+                                            + ", ReadTimeout = " + _currentPort.ReadTimeout.ToString()
+                                            + ", WriteTimeout = " + _currentPort.WriteTimeout.ToString()
                                             + ", Device Identifier = " + deviceDescription);
 
                     // Open and attempt a write and read
@@ -105,8 +107,8 @@ namespace ELM327API.Connection.Classes
                     catch (TimeoutException e)
                     {
                         AutoConnector.log.Error("TimeoutException has occurred. Assuming no response.", e);
-                        this.UpdateMessages("NO RESPONSE!");
-                        this.PortSuccess(false);
+                        UpdateMessages("NO RESPONSE!");
+                        PortSuccess(false);
                     }
 
                     // Parse response
@@ -115,17 +117,17 @@ namespace ELM327API.Connection.Classes
                         if (receivedDescription.Equals(deviceDescription))
                         {
                             AutoConnector.log.Info("Successfully connected on port " + portName + "!");
-                            this.UpdateMessages("SUCCESS!");
-                            this.PortSuccess(true);
+                            UpdateMessages("SUCCESS!");
+                            PortSuccess(true);
                             success = true;
-                            this.ConnectionEstablished(_currentPort);
+                            ConnectionEstablished(_currentPort);
                             break;
                         }
                         else
                         {
                             AutoConnector.log.Error("Response to [AT @1] determined to be invalid Device Identifier: " + receivedDescription);
-                            this.UpdateMessages("INVALID DEVICE NAME: " + receivedDescription);
-                            this.PortSuccess(false);
+                            UpdateMessages("INVALID DEVICE NAME: " + receivedDescription);
+                            PortSuccess(false);
                             success = false;
                             break;
                         }
@@ -137,24 +139,24 @@ namespace ELM327API.Connection.Classes
                 catch (IOException e)
                 {
                     AutoConnector.log.Error("IOException has occurred. Assuming No Device or Error.", e);
-                    this.UpdateMessages("NO DEVICE OR ERROR!");
-                    this.PortSuccess(false);
+                    UpdateMessages("NO DEVICE OR ERROR!");
+                    PortSuccess(false);
                 }
                 catch (InvalidOperationException e)
                 {
                     AutoConnector.log.Error("InvalidOperationException has occurred. Assuming No Device or Error.", e);
-                    this.UpdateMessages("NO DEVICE OR ERROR!");
-                    this.PortSuccess(false);
+                    UpdateMessages("NO DEVICE OR ERROR!");
+                    PortSuccess(false);
                 }
                 catch (UnauthorizedAccessException e)
                 {
                     AutoConnector.log.Error("UnauthorizedAccessException has occurred. Assuming No Device or Error.", e);
-                    this.UpdateMessages("PORT IN USE, ACCESS DENIED!");
-                    this.PortSuccess(false);
+                    UpdateMessages("PORT IN USE, ACCESS DENIED!");
+                    PortSuccess(false);
                 }
 
                 // Allow us to elegantly exit the thread
-                if (!this.KeepAlive)
+                if (!KeepAlive)
                 {
                     AutoConnector.log.Info("KeepAlive was false. Exiting thread...");
 
@@ -171,10 +173,10 @@ namespace ELM327API.Connection.Classes
 
             if (!success)
             {
-                this._currentPort.Close();
+                _currentPort.Close();
             }
 
-            this.ConnectionComplete(success);
+            ConnectionComplete(success);
         }
 
         /// <summary>
@@ -206,7 +208,7 @@ namespace ELM327API.Connection.Classes
         /// </summary>
         public void Kill()
         {
-            this.KeepAlive = false;
+            KeepAlive = false;
         }
     }
 }

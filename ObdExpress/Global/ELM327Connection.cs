@@ -1,12 +1,10 @@
 ﻿using ELM327API.Global;
 using ELM327API.Processing.Controllers;
-using ELM327API.Processing.Interfaces;
 using log4net;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Ports;
-using System.Reflection;
 
 namespace ObdExpress.Global
 {

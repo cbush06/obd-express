@@ -1,10 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Input;
 
 namespace ObdExpress.Ui.DataStructures
@@ -39,7 +35,7 @@ namespace ObdExpress.Ui.DataStructures
         {
             get
             {
-                return this._menuId;
+                return _menuId;
             }
         }
 
@@ -50,7 +46,7 @@ namespace ObdExpress.Ui.DataStructures
         {
             get
             {
-                return this._menuLabel;
+                return _menuLabel;
             }
         }
 
@@ -61,14 +57,14 @@ namespace ObdExpress.Ui.DataStructures
         {
             get
             {
-                return this._isSelected;
+                return _isSelected;
             }
             set
             {
-                this._isSelected = value;
+                _isSelected = value;
 
                 // Update any items monitoring this model
-                this.NotifyPropertyChanged("IsSelected");
+                NotifyPropertyChanged("IsSelected");
             }
         }
 
@@ -79,7 +75,7 @@ namespace ObdExpress.Ui.DataStructures
         {
             get
             {
-                return this._selectedItem;
+                return _selectedItem;
             }
         }
 
@@ -90,7 +86,7 @@ namespace ObdExpress.Ui.DataStructures
         {
             get
             {
-                return this.TopMenu_OnClick;
+                return TopMenu_OnClick;
             }
         }
 
@@ -101,8 +97,8 @@ namespace ObdExpress.Ui.DataStructures
         /// <param name="menuLabel">The label to be shown on this TopMenu's corresponding button.</param>
         public TopMenu(string menuId, string menuLabel)
         {
-            this._menuId = menuId;
-            this._menuLabel = menuLabel;
+            _menuId = menuId;
+            _menuLabel = menuLabel;
         }
 
         /// <summary>
@@ -115,7 +111,7 @@ namespace ObdExpress.Ui.DataStructures
         {
             if(topMenuEventListener != null)
             {
-                this._topMenuEvent += topMenuEventListener;
+                _topMenuEvent += topMenuEventListener;
             }
         }
 
@@ -126,7 +122,7 @@ namespace ObdExpress.Ui.DataStructures
         public void AddMenuItem(MenuItem menuItem)
         {
             // Get an Enumerator for the collection of MenuItems
-            IEnumerator<MenuItem> menuItemsEnum = this._menuItems.GetEnumerator();
+            IEnumerator<MenuItem> menuItemsEnum = _menuItems.GetEnumerator();
 
             // Determine if an item already exists with the new item's ID
             while (menuItemsEnum.MoveNext())
@@ -141,25 +137,25 @@ namespace ObdExpress.Ui.DataStructures
 
             // Attach this TopMenu's MenuItemEvent handler to the MenuItem's event so the TopMenu
             // may respond to it.
-            menuItem.AddMenuItemEventListener(this.MenuItemEventListener);
+            menuItem.AddMenuItemEventListener(MenuItemEventListener);
 
             // If no matches are found, add the new item
-            this._menuItems.Add(menuItem);
+            _menuItems.Add(menuItem);
 
             // If this was the first item, set it as the selected item
-            if (this._menuItems.Count == 1)
+            if (_menuItems.Count == 1)
             {
                 // Set the MenuItem as selected
                 menuItem.IsSelected = true;
 
                 // Store a reference to the selected item for this TopMenu
-                this._selectedItem = menuItem;
+                _selectedItem = menuItem;
             }
 
             // Trigger a TopMenuEvent
-            if (this._topMenuEvent != null)
+            if (_topMenuEvent != null)
             {
-                this._topMenuEvent(this, TopMenuEventType.MENU_MODIFIED);
+                _topMenuEvent(this, TopMenuEventType.MENU_MODIFIED);
             }
         }
 
@@ -170,7 +166,7 @@ namespace ObdExpress.Ui.DataStructures
         public void RemoveMenuItem(string menuItemId)
         {
             // Get an Enumerator for the collection of MenuItems
-            IEnumerator<MenuItem> menuItemsEnum = this._menuItems.GetEnumerator();
+            IEnumerator<MenuItem> menuItemsEnum = _menuItems.GetEnumerator();
 
             // Store a reference to the item to be removed
             MenuItem toRemove = null;
@@ -195,12 +191,12 @@ namespace ObdExpress.Ui.DataStructures
             else
             {
                 // A match was found, so remove it
-                this._menuItems.Remove(toRemove);
+                _menuItems.Remove(toRemove);
 
                 // Trigger a TopMenuEvent
-                if (this._topMenuEvent != null)
+                if (_topMenuEvent != null)
                 {
-                    this._topMenuEvent(this, TopMenuEventType.MENU_MODIFIED);
+                    _topMenuEvent(this, TopMenuEventType.MENU_MODIFIED);
                 }
             }
         }
@@ -213,7 +209,7 @@ namespace ObdExpress.Ui.DataStructures
         {
             if (topMenuEventListener != null)
             {
-                this._topMenuEvent += topMenuEventListener;
+                _topMenuEvent += topMenuEventListener;
             }
         }
 
@@ -225,7 +221,7 @@ namespace ObdExpress.Ui.DataStructures
         {
             if (topMenuEventListener != null)
             {
-                this._topMenuEvent -= topMenuEventListener;
+                _topMenuEvent -= topMenuEventListener;
             }
         }
 
@@ -235,7 +231,7 @@ namespace ObdExpress.Ui.DataStructures
         /// <returns>An IEnumerator for the collection of MenuItems.</returns>
         public IEnumerator<MenuItem> GetEnumerator()
         {
-            return this._menuItems.GetEnumerator();
+            return _menuItems.GetEnumerator();
         }
 
         /// <summary>
@@ -246,16 +242,16 @@ namespace ObdExpress.Ui.DataStructures
         public void MenuItemEventListener(MenuItem menuItem)
         {
             // De-select the old item
-            this._selectedItem.IsSelected = false;
+            _selectedItem.IsSelected = false;
 
             // Set the new item as the selected item
-            this._selectedItem = menuItem;
+            _selectedItem = menuItem;
 
             // Set the newly selected item to selected
-            this._selectedItem.IsSelected = true;
+            _selectedItem.IsSelected = true;
 
             // Bubble the event up
-            this._topMenuEvent(this, TopMenuEventType.MENUITEM_SELECTED);
+            _topMenuEvent(this, TopMenuEventType.MENUITEM_SELECTED);
         }
 
         /// <summary>
@@ -267,9 +263,9 @@ namespace ObdExpress.Ui.DataStructures
         {
             // We only want to evoke an action for this TopMenu.
             // Whether it is selected, or not, should be handled at a higher level.
-            if (!(this.IsSelected))
+            if (!(IsSelected))
             {
-                this._topMenuEvent(this, TopMenuEventType.TOPMENU_SELECTED);
+                _topMenuEvent(this, TopMenuEventType.TOPMENU_SELECTED);
             }
         }
 
@@ -278,9 +274,9 @@ namespace ObdExpress.Ui.DataStructures
         public event PropertyChangedEventHandler PropertyChanged;
         public void NotifyPropertyChanged(string propertyName)
         {
-            if (this.PropertyChanged != null)
+            if (PropertyChanged != null)
             {
-                this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
             }
         }
 

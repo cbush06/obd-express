@@ -79,12 +79,12 @@ namespace EngineDemandHandlers
 
         public bool HasRegisteredListeners
         {
-            get { return (this.RegisteredListeners != null); }
+            get { return (RegisteredListeners != null); }
         }
 
         public bool HasRegisteredSingleListeners
         {
-            get { return (this.RegisteredSingleListeners != null); }
+            get { return (RegisteredSingleListeners != null); }
         }
 
         public ProtocolsEnum Compatibility
@@ -96,20 +96,20 @@ namespace EngineDemandHandlers
         {
             if (callback != null)
             {
-                this.RegisteredListeners += callback;
+                RegisteredListeners += callback;
             }
         }
 
         public void UnregisterListener(Action<ELM327API.Processing.DataStructures.ELM327ListenerEventArgs> callback)
         {
-            if (callback != null && this.RegisteredListeners != null)
+            if (callback != null && RegisteredListeners != null)
             {
-                this.RegisteredListeners -= callback;
+                RegisteredListeners -= callback;
             }
 
-            if (callback != null && this.RegisteredSingleListeners != null)
+            if (callback != null && RegisteredSingleListeners != null)
             {
-                this.RegisteredSingleListeners -= callback;
+                RegisteredSingleListeners -= callback;
             }
         }
 
@@ -117,7 +117,7 @@ namespace EngineDemandHandlers
         {
             if (callback != null)
             {
-                this.RegisteredSingleListeners += callback;
+                RegisteredSingleListeners += callback;
             }
         }
 
@@ -129,15 +129,15 @@ namespace EngineDemandHandlers
 
             arg = new ELM327ListenerEventArgs(this, value);
 
-            if (this.RegisteredListeners != null)
+            if (RegisteredListeners != null)
             {
-                this.RegisteredListeners(arg);
+                RegisteredListeners(arg);
             }
 
-            if (this.RegisteredSingleListeners != null)
+            if (RegisteredSingleListeners != null)
             {
-                this.RegisteredSingleListeners(arg);
-                this.RegisteredSingleListeners = null;
+                RegisteredSingleListeners(arg);
+                RegisteredSingleListeners = null;
             }
         }
     }

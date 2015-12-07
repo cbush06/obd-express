@@ -1,13 +1,6 @@
 ﻿using ELM327API.Processing.DataStructures;
-using ObdExpress.Global;
-using System;
-using System.Collections.Generic;
 using System.IO.Ports;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
 
 namespace ObdExpress.Ui.UserControls.Interfaces
 {

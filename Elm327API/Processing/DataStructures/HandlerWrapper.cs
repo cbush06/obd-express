@@ -1,10 +1,6 @@
 ﻿using ELM327API.Processing.Interfaces;
 using log4net;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ELM327API.Processing.DataStructures
 {
@@ -23,7 +19,7 @@ namespace ELM327API.Processing.DataStructures
         {
             get
             {
-                return this._handlerType;
+                return _handlerType;
             }
         }
 
@@ -35,7 +31,7 @@ namespace ELM327API.Processing.DataStructures
         {
             get
             {
-                return this._handler;
+                return _handler;
             }
         }
 
@@ -46,7 +42,7 @@ namespace ELM327API.Processing.DataStructures
         {
             get
             {
-                return this._handler.Name;
+                return _handler.Name;
             }
         }
 
@@ -57,7 +53,7 @@ namespace ELM327API.Processing.DataStructures
         {
             get
             {
-                return this._handler.Unit;
+                return _handler.Unit;
             }
         }
 
@@ -68,7 +64,7 @@ namespace ELM327API.Processing.DataStructures
         {
             get
             {
-                return this._handler.Category;
+                return _handler.Category;
             }
         }
 
@@ -85,10 +81,10 @@ namespace ELM327API.Processing.DataStructures
                 try
                 {
                     // Create the handler
-                    this._handler = (IHandler)Activator.CreateInstance(handlerType);
+                    _handler = (IHandler)Activator.CreateInstance(handlerType);
 
                     // Store a reference to this type so that we may instantiante it the first time it is requested
-                    this._handlerType = handlerType;
+                    _handlerType = handlerType;
                 }
                 catch (Exception e)
                 {

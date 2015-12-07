@@ -3,20 +3,10 @@ using ELM327API.Processing.DataStructures;
 using ObdExpress.Global;
 using ObdExpress.Ui.DataStructures;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 
 namespace ObdExpress.Ui.UserControls.HomePanels
 {
@@ -59,7 +49,7 @@ namespace ObdExpress.Ui.UserControls.HomePanels
         public VehicleInformationPanelProperties(VehicleInformationPanel parent)
         {
             int counter = 0;
-            this._parent = parent;
+            _parent = parent;
             InitializeComponent();
 
             // Populate our list of choices
@@ -102,7 +92,7 @@ namespace ObdExpress.Ui.UserControls.HomePanels
                 }
             }
 
-            this.OnPropertyChanged("DashboardPanelPropertyOptions");
+            OnPropertyChanged("DashboardPanelPropertyOptions");
         }
 
         /// <summary>
@@ -120,13 +110,13 @@ namespace ObdExpress.Ui.UserControls.HomePanels
         /// <param name="e"></param>
         private void btnUp_Click(object sender, RoutedEventArgs e)
         {
-            if (this.SelectedItem != null)
+            if (SelectedItem != null)
             {
-                if (this.SelectedItem.Position != 0)
+                if (SelectedItem.Position != 0)
                 {
-                    this.PanelPropertyOptions.Move(this.SelectedItem.Position, this.SelectedItem.Position - 1);
-                    this.PanelPropertyOptions[this.SelectedItem.Position].Position = this.SelectedItem.Position;
-                    this.SelectedItem.Position = this.SelectedItem.Position - 1;
+                    PanelPropertyOptions.Move(SelectedItem.Position, SelectedItem.Position - 1);
+                    PanelPropertyOptions[SelectedItem.Position].Position = SelectedItem.Position;
+                    SelectedItem.Position = SelectedItem.Position - 1;
                 }
             }
         }
@@ -138,13 +128,13 @@ namespace ObdExpress.Ui.UserControls.HomePanels
         /// <param name="e"></param>
         private void btnDown_Click(object sender, RoutedEventArgs e)
         {
-            if (this.SelectedItem != null)
+            if (SelectedItem != null)
             {
-                if (this.SelectedItem.Position < (this.PanelPropertyOptions.Count - 1))
+                if (SelectedItem.Position < (PanelPropertyOptions.Count - 1))
                 {
-                    this.PanelPropertyOptions.Move(this.SelectedItem.Position, this.SelectedItem.Position + 1);
-                    this.PanelPropertyOptions[this.SelectedItem.Position].Position = this.SelectedItem.Position;
-                    this.SelectedItem.Position = this.SelectedItem.Position + 1;
+                    PanelPropertyOptions.Move(SelectedItem.Position, SelectedItem.Position + 1);
+                    PanelPropertyOptions[SelectedItem.Position].Position = SelectedItem.Position;
+                    SelectedItem.Position = SelectedItem.Position + 1;
                 }
             }
         }
@@ -171,7 +161,7 @@ namespace ObdExpress.Ui.UserControls.HomePanels
             _parent.DataItems.Clear();
 
             // Build the new value for this Setting
-            foreach (PanelPropertyOption nextItem in this.PanelPropertyOptions)
+            foreach (PanelPropertyOption nextItem in PanelPropertyOptions)
             {
                 if (nextItem.IsChecked)
                 {
@@ -194,16 +184,16 @@ namespace ObdExpress.Ui.UserControls.HomePanels
                 _parent.StartMonitoring(null);
             }
 
-            this.Close();
+            Close();
         }
 
         #region Implementation of INotifyPropertyChanged
         public event PropertyChangedEventHandler PropertyChanged;
         private void OnPropertyChanged(string propertyName)
         {
-            if (this.PropertyChanged != null)
+            if (PropertyChanged != null)
             {
-                this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
             }
         }
         #endregion

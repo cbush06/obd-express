@@ -3,6 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:uc="clr-namespace:ObdExpress.Ui.UserControls"
         xmlns:hc="clr-namespace:ObdExpress.Ui.UserControls.HomePanels"
+        xmlns:elmdata="clr-namespace:ELM327API.Processing.DataStructures;assembly=Elm327API"
         Title="OBD Express" Height="666" Width="889" Closing="_mainWindow_Closing"
         WindowStartupLocation="CenterScreen" Loaded="MainWindow_Loaded"
         Icon="/ObdExpress;component/Ui/Images/48x48icon.png"
@@ -43,7 +44,7 @@
         </Menu>
         
         <ToolBarTray Grid.Row="1" Margin="0,0,0,1">
-            <ToolBar Band="1" BandIndex="1">
+            <ToolBar Band="1">
                 <Button x:Name="tbBtnConnect" x:FieldModifier="private" ToolTip="Connect..." Click="FileMenu_Connect_Click" Style="{StaticResource ToolbarButtons}">
                     <Image Source="/ObdExpress;component/Ui/Images/connect.png" Stretch="Fill" />
                 </Button>
@@ -51,10 +52,20 @@
                     <Image Source="/ObdExpress;component/Ui/Images/disconnect.png" Stretch="Fill" />
                 </Button>
             </ToolBar>
-            <ToolBar Band="1" BandIndex="2">
+            <ToolBar Band="1">
                 <Button x:Name="tbBtnConsole" x:FieldModifier="private" ToolTip="Open Logging Console..." Click="Toolbar_Console_Click" Style="{StaticResource ToolbarButtons}">
                     <Image Source="/ObdExpress;component/Ui/Images/Gnome-Utilities-Terminal-32.png" Stretch="Fill" />
                 </Button>
+            </ToolBar>
+            <ToolBar Band="1">
+                <Label Content="ECU Selected:" />
+                <ComboBox x:Name="ddlEcu" VerticalAlignment="Stretch" MinWidth="100" SelectionChanged="ddlEcu_SelectionChanged" SelectedItem="{Binding SelectedEcuFilter}">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate DataType="{x:Type elmdata:ECU}">
+                            <Label Content="{Binding Name}" />
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
             </ToolBar>
         </ToolBarTray>
 
@@ -79,7 +90,7 @@
             <!-- Main Content Area -->
             <DockPanel Grid.Column="2" LastChildFill="True">
                 <!-- Title Bar -->
-                <Border SnapsToDevicePixels="True" DockPanel.Dock="Top" BorderBrush="Black" BorderThickness="1.0" Margin="20,0,20,10">
+                <Border SnapsToDevicePixels="True" DockPanel.Dock="Top" BorderBrush="Black" BorderThickness="1.0" Margin="10,0,10,10">
                     <Grid x:Name="MainPanelGrid" Height="Auto" HorizontalAlignment="Stretch">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto" />
@@ -112,7 +123,7 @@
                 
                 <!-- Content Panels -->
                 <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" DockPanel.Dock="Top">
-                    <Grid Margin="20,0,20,0" Name="ContentAreaGrid" x:FieldModifier="private" />
+                    <Grid Margin="10,0,10,0" Name="ContentAreaGrid" x:FieldModifier="private" />
                 </ScrollViewer>
             </DockPanel>
 

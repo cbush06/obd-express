@@ -248,18 +248,18 @@ namespace ObdExpress.Ui.UserControls.ConfigurationPanels
         public void ShowPanel(object sender, RoutedEventArgs e)
         {
             _isShown = true;
-            if (this.Show != null)
+            if (Show != null)
             {
-                this.Show(this, e);
+                Show(this, e);
             }
         }
 
         public void HidePanel(object sender, RoutedEventArgs e)
         {
             _isShown = false;
-            if (this.Hide != null)
+            if (Hide != null)
             {
-                this.Hide(this, e);
+                Hide(this, e);
             }
         }
 
@@ -296,13 +296,13 @@ namespace ObdExpress.Ui.UserControls.ConfigurationPanels
             {
                 case Variables.REGISTERED_EVENT_TYPE_HIDE_PANEL:
                     {
-                        this.Hide += ROUTED_EVENT_HANDLER;
+                        Hide += ROUTED_EVENT_HANDLER;
                         break;
                     }
 
                 case Variables.REGISTERED_EVENT_TYPE_SHOW_PANEL:
                     {
-                        this.Show += ROUTED_EVENT_HANDLER;
+                        Show += ROUTED_EVENT_HANDLER;
                         break;
                     }
             }
@@ -314,13 +314,13 @@ namespace ObdExpress.Ui.UserControls.ConfigurationPanels
             {
                 case Variables.REGISTERED_EVENT_TYPE_HIDE_PANEL:
                     {
-                        this.Hide -= ROUTED_EVENT_HANDLER;
+                        Hide -= ROUTED_EVENT_HANDLER;
                         break;
                     }
 
                 case Variables.REGISTERED_EVENT_TYPE_SHOW_PANEL:
                     {
-                        this.Show -= ROUTED_EVENT_HANDLER;
+                        Show -= ROUTED_EVENT_HANDLER;
                         break;
                     }
             }

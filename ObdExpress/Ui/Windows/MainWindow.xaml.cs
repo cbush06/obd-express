@@ -1,4 +1,5 @@
-﻿using log4net;
+﻿using ELM327API.Processing.DataStructures;
+using log4net;
 using ObdExpress.Global;
 using ObdExpress.Ui.DataStructures;
 using ObdExpress.Ui.UserControls.Interfaces;
@@ -48,7 +49,7 @@ namespace ObdExpress.Ui.Windows
         {
             get
             {
-                return this._menuItems;
+                return _menuItems;
             }
         }
 
@@ -60,9 +61,26 @@ namespace ObdExpress.Ui.Windows
         {
             get
             {
-                return this._topMenuItems;
+                return _topMenuItems;
             }
         }
+
+        /// <summary>
+        /// Stores the list of ECU Items to be shown in the top toolbar. Only message traffic for the selected ECU will be received or transmitted.
+        /// </summary>
+        private ObservableCollection<ECU> _ecuItems = new ObservableCollection<ECU>();
+        public ObservableCollection<ECU> EcuItems
+        {
+            get
+            {
+                return _ecuItems;
+            }
+        }
+
+        /// <summary>
+        /// Store the selected ECU.
+        /// </summary>
+        public ECU SelectedEcuFilter { get; set; }
 
         /// <summary>
         /// Property backing the title shown above all the panels.
@@ -72,7 +90,7 @@ namespace ObdExpress.Ui.Windows
         {
             get
             {
-                return this._selectedMenuItemLabel;
+                return _selectedMenuItemLabel;
             }
         }
 
@@ -102,7 +120,7 @@ namespace ObdExpress.Ui.Windows
             InitializeComponent();
 
             // Build our menu
-            this.BuildMenu();
+            BuildMenu();
 
             // Set the TopWindow
             MainWindow._topWindow = this;
@@ -116,8 +134,8 @@ namespace ObdExpress.Ui.Windows
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
             // Register the window with global events
-            ELM327Connection.ConnectionEstablishedEvent += this.ConnectionEstablished;
-            ELM327Connection.ConnectionDestroyedEvent += this.ConnectionDestroyed;
+            ELM327Connection.ConnectionEstablishedEvent += ConnectionEstablished;
+            ELM327Connection.ConnectionDestroyedEvent += ConnectionDestroyed;
         }
 
         /// <summary>
@@ -126,12 +144,14 @@ namespace ObdExpress.Ui.Windows
         /// <param name="connection">Port on which the ELM327 connection is established.</param>
         private void ConnectionEstablished(SerialPort connection)
         {
-            this.lblStatus.Content = "Connected.";
-            this.imgConnection.Source = new BitmapImage(new Uri("pack://application:,,,/ObdExpress;component/Ui/Images/connect.png"));
-            this.miConnect.IsEnabled = false;
-            this.miDisconnect.IsEnabled = true;
-            this.tbBtnConnect.IsEnabled = false;
-            this.tbBtnDisconnect.IsEnabled = true;
+            lblStatus.Content = "Connected.";
+            imgConnection.Source = new BitmapImage(new Uri("pack://application:,,,/ObdExpress;component/Ui/Images/connect.png"));
+            miConnect.IsEnabled = false;
+            miDisconnect.IsEnabled = true;
+            tbBtnConnect.IsEnabled = false;
+            tbBtnDisconnect.IsEnabled = true;
+            ddlEcu.ItemsSource = 
+            ddlEcu.ItemsSource = new List<ECU>(ELM327Connection.ELM327Device.ResponsiveEcus);
         }
 
         /// <summary>
@@ -139,12 +159,12 @@ namespace ObdExpress.Ui.Windows
         /// </summary>
         private void ConnectionDestroyed()
         {
-            this.lblStatus.Content = "Disconnected.";
-            this.imgConnection.Source = new BitmapImage(new Uri("pack://application:,,,/ObdExpress;component/Ui/Images/disconnect.png"));
-            this.miConnect.IsEnabled = true;
-            this.miDisconnect.IsEnabled = false;
-            this.tbBtnConnect.IsEnabled = true;
-            this.tbBtnDisconnect.IsEnabled = false;
+            lblStatus.Content = "Disconnected.";
+            imgConnection.Source = new BitmapImage(new Uri("pack://application:,,,/ObdExpress;component/Ui/Images/disconnect.png"));
+            miConnect.IsEnabled = true;
+            miDisconnect.IsEnabled = false;
+            tbBtnConnect.IsEnabled = true;
+            tbBtnDisconnect.IsEnabled = false;
         }
 
         /// <summary>
@@ -166,18 +186,18 @@ namespace ObdExpress.Ui.Windows
             TopMenu configMenu = new TopMenu(Variables.TOP_MENU_ITEM_ID_CONFIGURATION, "Configuration");
             configMenu.AddMenuItem(new DataStructures.MenuItem(Variables.MENU_ITEM_ID_CONFIGURATION, "Connection", "pack://application:,,,/ObdExpress;component/Ui/Images/connect.png"));
 
-            this._navMenu.AddTopMenu(mainMenu);
-            this._navMenu.AddTopMenu(configMenu);
+            _navMenu.AddTopMenu(mainMenu);
+            _navMenu.AddTopMenu(configMenu);
 
             /*
              * Attach our event handler
              */
-            this._navMenu.AddNavigationMenuEventListener(this.NavigationMenuEventHandler);
+            _navMenu.AddNavigationMenuEventListener(NavigationMenuEventHandler);
 
             /*
              * Render the NavigationMenu in the GUI
              */
-            this.RenderNavigationMenu();
+            RenderNavigationMenu();
         }
 
         /// <summary>
@@ -185,31 +205,31 @@ namespace ObdExpress.Ui.Windows
         /// </summary>
         private void RenderNavigationMenu()
         {
-            IEnumerator<TopMenu> tEnum = this._navMenu.GetEnumerator();
+            IEnumerator<TopMenu> tEnum = _navMenu.GetEnumerator();
             IEnumerator<DataStructures.MenuItem> mEnum;
 
-            this._topMenuItems.Clear();
+            _topMenuItems.Clear();
 
             while (tEnum.MoveNext())
             {
                 // Add the TopMenu
-                this._topMenuItems.Add(tEnum.Current);
+                _topMenuItems.Add(tEnum.Current);
 
                 if (tEnum.Current.IsSelected)
                 {
                     mEnum = tEnum.Current.GetEnumerator();
-                    this._menuItems.Clear();
+                    _menuItems.Clear();
 
                     while (mEnum.MoveNext())
                     {
-                        this._menuItems.Add(mEnum.Current);
+                        _menuItems.Add(mEnum.Current);
                     }
                 }
             }
 
             // Now that the menu is built and ready, notify this window to display the content
             // corresponding to the selected Menu Item (in this case, the Home page).
-            NavigationMenuEventHandler(this._navMenu, NavigationMenuEventType.MENUITEM_SELECTED);
+            NavigationMenuEventHandler(_navMenu, NavigationMenuEventType.MENUITEM_SELECTED);
         }
 
         /// <summary>
@@ -221,15 +241,15 @@ namespace ObdExpress.Ui.Windows
         {
             if (type == NavigationMenuEventType.MENU_MODIFIED || type == NavigationMenuEventType.TOPMENU_SELECTED)
             {
-                this.RenderNavigationMenu();
+                RenderNavigationMenu();
             }
 
             if (type == NavigationMenuEventType.MENUITEM_SELECTED || type == NavigationMenuEventType.TOPMENU_SELECTED)
             {
-                if (!(this._selectedMenuItemLabel.Equals(menu.SelectedMenuItem.Label)))
+                if (!(_selectedMenuItemLabel.Equals(menu.SelectedMenuItem.Label)))
                 {
                     // Change the Main Title
-                    this._selectedMenuItemLabel = menu.SelectedMenuItem.Label;
+                    _selectedMenuItemLabel = menu.SelectedMenuItem.Label;
                     OnPropertyChanged("SelectedMenuItemLabel");
 
                     // Change the Panel Collection
@@ -264,14 +284,14 @@ namespace ObdExpress.Ui.Windows
 
             // If this type does not already exist in the panel collections Dictionary,
             // create a new instance and add it. If it does, return that instance.
-            if (!(this._panelCollections.ContainsKey(menuItemId)))
+            if (!(_panelCollections.ContainsKey(menuItemId)))
             {
                 returnValue = (IPanelCollection)Activator.CreateInstance(panelCollectionType);
-                this._panelCollections.Add(menuItemId, returnValue);
+                _panelCollections.Add(menuItemId, returnValue);
             }
             else
             {
-                this._panelCollections.TryGetValue(menuItemId, out returnValue);
+                _panelCollections.TryGetValue(menuItemId, out returnValue);
             }
 
             return returnValue;
@@ -286,9 +306,9 @@ namespace ObdExpress.Ui.Windows
             System.Windows.Controls.MenuItem menuItem;
 
             // Prepare the Panels for Removal
-            if (this._selectedPanelCollection != null)
+            if (_selectedPanelCollection != null)
             {
-                foreach (IRegisteredPanel nextPanel in this._selectedPanelCollection.Panels)
+                foreach (IRegisteredPanel nextPanel in _selectedPanelCollection.Panels)
                 {
                     // Notify them to Pause Monitoring
                     nextPanel.PauseMonitoring();
@@ -300,17 +320,17 @@ namespace ObdExpress.Ui.Windows
             }
 
             // Change Collections
-            this._selectedPanelCollection = panelCollection;
+            _selectedPanelCollection = panelCollection;
 
             // Clear out the Content Area
-            this.ContentAreaGrid.Children.Clear();
-            this.ContentAreaGrid.RowDefinitions.Clear();
+            ContentAreaGrid.Children.Clear();
+            ContentAreaGrid.RowDefinitions.Clear();
 
             // Remove all menu items
-            this.menAvailablePanels.Items.Clear();
+            menAvailablePanels.Items.Clear();
 
             // Build the Row Definitions for the Home Panels and Add the panels
-            foreach (IRegisteredPanel nextPanel in this._selectedPanelCollection.Panels)
+            foreach (IRegisteredPanel nextPanel in _selectedPanelCollection.Panels)
             {
                 // Add the panel to available panels menu
                 menuItem = new System.Windows.Controls.MenuItem();
@@ -326,16 +346,16 @@ namespace ObdExpress.Ui.Windows
                 nextPanel.RegisterEventHandler(Variables.REGISTERED_EVENT_TYPE_HIDE_PANEL, RemovePanelFromDisplay);
                 nextPanel.RegisterEventHandler(Variables.REGISTERED_EVENT_TYPE_SHOW_PANEL, AddPanelToDisplay);
 
-                this.menAvailablePanels.Items.Add(menuItem);
+                menAvailablePanels.Items.Add(menuItem);
 
                 // Add the Panel to be displayed
                 if (nextPanel.IsShown)
                 {
                     // Add the next panel
-                    ((UserControl)nextPanel).SetValue(Grid.RowProperty, this.ContentAreaGrid.RowDefinitions.Count);
+                    ((UserControl)nextPanel).SetValue(Grid.RowProperty, ContentAreaGrid.RowDefinitions.Count);
                     ((UserControl)nextPanel).SetValue(Grid.ColumnProperty, 0);
-                    this.ContentAreaGrid.RowDefinitions.Add(new RowDefinition() { Height = GridLength.Auto });
-                    this.ContentAreaGrid.Children.Add((UserControl)nextPanel);
+                    ContentAreaGrid.RowDefinitions.Add(new RowDefinition() { Height = GridLength.Auto });
+                    ContentAreaGrid.Children.Add((UserControl)nextPanel);
 
                     // Unpause the next panel
                     if (nextPanel.IsPaused)
@@ -349,10 +369,10 @@ namespace ObdExpress.Ui.Windows
 
                     // Add a GridSplitter
                     gridSplitter = new GridSplitter() { Height = 4.0d, HorizontalAlignment = HorizontalAlignment.Stretch, VerticalAlignment = VerticalAlignment.Center, Margin = new Thickness(0, 3, 0, 3), Background = new SolidColorBrush(Colors.Transparent) };
-                    gridSplitter.SetValue(Grid.RowProperty, this.ContentAreaGrid.RowDefinitions.Count);
+                    gridSplitter.SetValue(Grid.RowProperty, ContentAreaGrid.RowDefinitions.Count);
                     gridSplitter.SetValue(Grid.ColumnProperty, 0);
-                    this.ContentAreaGrid.RowDefinitions.Add(new RowDefinition() { Height = GridLength.Auto });
-                    this.ContentAreaGrid.Children.Add(gridSplitter);
+                    ContentAreaGrid.RowDefinitions.Add(new RowDefinition() { Height = GridLength.Auto });
+                    ContentAreaGrid.Children.Add(gridSplitter);
                 }
             }
         }
@@ -366,22 +386,22 @@ namespace ObdExpress.Ui.Windows
             IRegisteredPanel removedPanel = (IRegisteredPanel)sender;
 
             // Remove the Panel
-            for (int i = 0; i < this.ContentAreaGrid.Children.Count; i++)
+            for (int i = 0; i < ContentAreaGrid.Children.Count; i++)
             {
-                if (this.ContentAreaGrid.Children[i] == sender)
+                if (ContentAreaGrid.Children[i] == sender)
                 {
                     // Remove the Panel and the GridSplitter after it
-                    this.ContentAreaGrid.Children.RemoveAt(i);
-                    this.ContentAreaGrid.Children.RemoveAt(i);
+                    ContentAreaGrid.Children.RemoveAt(i);
+                    ContentAreaGrid.Children.RemoveAt(i);
 
                     // Remove two Row Definitions
-                    this.ContentAreaGrid.RowDefinitions.RemoveAt(i);
-                    this.ContentAreaGrid.RowDefinitions.RemoveAt(i);
+                    ContentAreaGrid.RowDefinitions.RemoveAt(i);
+                    ContentAreaGrid.RowDefinitions.RemoveAt(i);
 
                     // Re-index the Children's Row Indexes
-                    for (int j = 0; j < this.ContentAreaGrid.Children.Count; j++)
+                    for (int j = 0; j < ContentAreaGrid.Children.Count; j++)
                     {
-                        this.ContentAreaGrid.Children[j].SetValue(Grid.RowProperty, j);
+                        ContentAreaGrid.Children[j].SetValue(Grid.RowProperty, j);
                     }
 
                     break;
@@ -389,9 +409,9 @@ namespace ObdExpress.Ui.Windows
             }
 
             // Ensure the menu item is unchecked
-            for (int i = 0; i < this.menAvailablePanels.Items.Count; i++)
+            for (int i = 0; i < menAvailablePanels.Items.Count; i++)
             {
-                System.Windows.Controls.MenuItem menuItem = (System.Windows.Controls.MenuItem)this.menAvailablePanels.Items[i];
+                System.Windows.Controls.MenuItem menuItem = (System.Windows.Controls.MenuItem)menAvailablePanels.Items[i];
                 string menuItemLabel = (string)(((Label)(menuItem.Header)).Content);
 
                 if (menuItemLabel.Equals(removedPanel.Title) && menuItem.IsChecked)
@@ -410,16 +430,16 @@ namespace ObdExpress.Ui.Windows
             IRegisteredPanel nextPanel = (IRegisteredPanel)sender;
             
             // Add the next panel
-            ((UserControl)nextPanel).SetValue(Grid.RowProperty, this.ContentAreaGrid.RowDefinitions.Count);
-            this.ContentAreaGrid.RowDefinitions.Add(new RowDefinition() { Height = GridLength.Auto });
-            this.ContentAreaGrid.Children.Add((UserControl)nextPanel);
+            ((UserControl)nextPanel).SetValue(Grid.RowProperty, ContentAreaGrid.RowDefinitions.Count);
+            ContentAreaGrid.RowDefinitions.Add(new RowDefinition() { Height = GridLength.Auto });
+            ContentAreaGrid.Children.Add((UserControl)nextPanel);
 
             // Add a GridSplitter
             gridSplitter = new GridSplitter() { Height = 4.0d, HorizontalAlignment = HorizontalAlignment.Stretch, VerticalAlignment = VerticalAlignment.Center, Margin = new Thickness(0, 3, 0, 3), Background = new SolidColorBrush(Colors.Transparent) };
-            gridSplitter.SetValue(Grid.RowProperty, this.ContentAreaGrid.RowDefinitions.Count);
+            gridSplitter.SetValue(Grid.RowProperty, ContentAreaGrid.RowDefinitions.Count);
             gridSplitter.SetValue(Grid.ColumnProperty, 0);
-            this.ContentAreaGrid.RowDefinitions.Add(new RowDefinition() { Height = GridLength.Auto });
-            this.ContentAreaGrid.Children.Add(gridSplitter);
+            ContentAreaGrid.RowDefinitions.Add(new RowDefinition() { Height = GridLength.Auto });
+            ContentAreaGrid.Children.Add(gridSplitter);
         }
 
         /// <summary>
@@ -468,12 +488,12 @@ namespace ObdExpress.Ui.Windows
         /// <param name="e"></param>
         private void Toolbar_Console_Click(object sender, RoutedEventArgs e)
         {
-            if (this._loggingConsole == null)
+            if (_loggingConsole == null)
             {
-                this._loggingConsole = new LoggingConsole();
-                this._loggingConsole.Closed += Console_Closed;
-                this._loggingConsole.Owner = MainWindow._topWindow;
-                this._loggingConsole.Show();
+                _loggingConsole = new LoggingConsole();
+                _loggingConsole.Closed += Console_Closed;
+                _loggingConsole.Owner = MainWindow._topWindow;
+                _loggingConsole.Show();
             }
         }
 
@@ -484,7 +504,7 @@ namespace ObdExpress.Ui.Windows
         /// <param name="e"></param>
         private void Console_Closed(object sender, EventArgs e)
         {
-            this._loggingConsole = null;
+            _loggingConsole = null;
         }
 
         /// <summary>
@@ -499,14 +519,25 @@ namespace ObdExpress.Ui.Windows
             ELM327Connection.DestroyConnection();
         }
 
+        /// <summary>
+        /// Handles changes to the ECU filter combobox.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ddlEcu_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            MainWindow.log.Info((SelectedEcuFilter != null) ? SelectedEcuFilter.Name : "NULL");
+            ELM327Connection.ELM327Device.SelectedEcuFilter = SelectedEcuFilter;
+        }
+
 
         #region Implementation of INotifyPropertyChanged
         public event PropertyChangedEventHandler PropertyChanged;
         private void OnPropertyChanged(string propertyName)
         {
-            if (this.PropertyChanged != null)
+            if (PropertyChanged != null)
             {
-                this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
             }
         }
         #endregion

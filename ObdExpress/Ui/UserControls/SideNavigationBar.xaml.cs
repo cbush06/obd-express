@@ -1,17 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace ObdExpress.Ui.UserControls
 {
@@ -48,7 +36,7 @@ namespace ObdExpress.Ui.UserControls
         {
             get
             {
-                return this._navigationViewer;
+                return _navigationViewer;
             }
         }
 
@@ -60,7 +48,7 @@ namespace ObdExpress.Ui.UserControls
         {
             get
             {
-                return this._topMenuViewer;
+                return _topMenuViewer;
             }
         }
 
@@ -73,8 +61,8 @@ namespace ObdExpress.Ui.UserControls
             InitializeComponent();
 
             // Obtain references to the two main components in this UserControl
-            this._navigationViewer = navigationViewer;
-            this._topMenuViewer = menuSelectViewer;
+            _navigationViewer = navigationViewer;
+            _topMenuViewer = menuSelectViewer;
         }
     }
 }
